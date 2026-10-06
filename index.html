@@ -65,6 +65,12 @@
             }
         }
 
+        @media (min-width: 1024px) {
+            .services-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
         .card {
             background-color: var(--card-bg);
             border-radius: 15px;
@@ -133,16 +139,39 @@
         </div>
 
         <div class="services-grid">
+            <!-- نظام الرواتب -->
             <a href="payroll.html" class="card">
                 <div class="icon-circle">📊</div>
                 <h3>نظام الرواتب والفئات</h3>
                 <p>إدارة كشوفات الحضور وحساب الرواتب والفئات النقدية</p>
             </a>
 
+            <!-- قارئ الهوية -->
             <a href="iqama.html" class="card">
                 <div class="icon-circle">📄</div>
-                <h3> اقارئ الهوية الرقمية</h3>
+                <h3>قارئ الهوية الرقمية</h3>
                 <p>نظام استخراج وقراءة بيانات الهوية الرقمية</p>
+            </a>
+
+            <!-- الموردين -->
+            <a href="suppliers.html" class="card">
+                <div class="icon-circle">🤝</div>
+                <h3>الموردين</h3>
+                <p>إدارة حسابات ومتابعة بيانات وتعاملات الموردين</p>
+            </a>
+
+            <!-- النماذج -->
+            <a href="forms.html" class="card">
+                <div class="icon-circle">📁</div>
+                <h3>النماذج</h3>
+                <p>استعراض وتحميل النماذج والمستندات الإدارية</p>
+            </a>
+
+            <!-- بيانات الموظفين -->
+            <a href="employees.html" class="card">
+                <div class="icon-circle">👥</div>
+                <h3>بيانات الموظفين</h3>
+                <p>إدارة ملفات وسجلات بيانات العاملين بالشركة</p>
             </a>
         </div>
     </div>
