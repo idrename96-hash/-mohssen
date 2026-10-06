@@ -3,185 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نماذج المقابلات الشخصية للفنيين | البحيرات الدولية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- مكتبات قراءة الإكسيل وتصدير الوورد -->
+    <title>نماذج المقابلات والتصاريح | البحيرات الدولية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.8.2/docx.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
     <style>
         :root {
-            --primary: #1e3c72;
-            --primary-light: #2a5298;
-            --accent: #00b09b;
-            --bg-color: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-dark: #333333;
-            --text-gray: #666666;
-            --border-color: #333;
+            --primary: #1e3c72; --primary-light: #2a5298; --accent: #00b09b;
+            --bg-color: #f0f2f5; --card-bg: #ffffff; --text-dark: #333333; --border-color: #333;
         }
 
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
-            color: var(--text-dark);
-        }
+        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; direction: rtl; text-align: right; color: var(--text-dark); }
+        .container { max-width: 1000px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #e1e4e8; padding-bottom: 15px; }
+        .back-btn { background-color: var(--primary); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px; }
+        h2 { color: var(--primary); margin: 0; }
+        .form-group { margin-bottom: 20px; }
+        .label-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        label { font-weight: 600; color: var(--primary); margin: 0; }
+        .btn-template { background: linear-gradient(to left, #27ae60, #2ecc71); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
+        .btn-template:hover { background: linear-gradient(to left, #219653, #27ae60); }
+        
+        .file-upload-wrapper { position: relative; width: 100%; height: 60px; border: 2px dashed #e1e4e8; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #fafafa; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
+        .file-upload-wrapper:hover { border-color: var(--primary-light); background-color: #f1f6ff; }
+        .file-upload-wrapper input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
+        
+        .btn { background: linear-gradient(to left, var(--primary), var(--primary-light)); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn:hover { background: linear-gradient(to left, var(--accent), #1de9b6); }
+        .btn-permit { background: linear-gradient(to left, #8e44ad, #9b59b6); margin-top: 15px; }
+        .btn-permit:hover { background: linear-gradient(to left, #732d91, #8e44ad); }
+        .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; }
 
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: var(--card-bg);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
+        #previewContainer { margin-top: 30px; display: none; }
+        
+        /* تنسيق نموذج المقابلة */
+        .interview-sheet { border: 2px solid var(--border-color); background: #fff; margin-bottom: 40px; font-size: 14px; direction: rtl; page-break-after: always; }
+        .sheet-table { width: 100%; border-collapse: collapse; text-align: right; }
+        .sheet-table th, .sheet-table td { border: 1px solid var(--border-color); padding: 8px 10px; vertical-align: middle; }
+        .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
+        .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid #e1e4e8;
-            padding-bottom: 15px;
-        }
-
-        .back-btn {
-            background-color: var(--primary);
-            color: white;
-            padding: 8px 15px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 14px;
-            transition: 0.3s;
-        }
-
-        .back-btn:hover {
-            background-color: var(--accent);
-        }
-
-        h2 {
-            color: var(--primary);
-            margin: 0;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e1e4e8;
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 16px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        .file-upload-wrapper {
-            position: relative;
-            width: 100%;
-            height: 60px;
-            border: 2px dashed #e1e4e8;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background-color: #fafafa;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .file-upload-wrapper:hover {
-            border-color: var(--primary-light);
-            background-color: #f1f6ff;
-        }
-
-        .file-upload-wrapper input[type="file"] {
+        /* تنسيق النصوص فوق صورة التصريح (أصبحت ثابتة بدون تحديد) */
+        .overlay-text {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            opacity: 0;
-            cursor: pointer;
-        }
-
-        .btn {
-            background: linear-gradient(to left, var(--primary), var(--primary-light));
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
-            transition: 0.3s;
-            margin-top: 15px;
-        }
-
-        .btn:hover {
-            background: linear-gradient(to left, var(--accent), #1de9b6);
-        }
-
-        .btn-success {
-            background: linear-gradient(to left, var(--accent), #1de9b6);
-            display: none;
-            margin-top: 20px;
-        }
-
-        /* تنسيق معاينة النموذج المطابق لصورتك */
-        #previewContainer {
-            margin-top: 30px;
-            display: none;
-        }
-
-        .interview-sheet {
-            border: 2px solid var(--border-color);
-            background: #fff;
-            padding: 0;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            font-family: 'Arial', 'Cairo', sans-serif;
+            font-weight: bold;
             font-size: 14px;
-        }
-
-        .sheet-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-
-        .sheet-table th, .sheet-table td {
-            border: 1px solid var(--border-color);
-            padding: 8px 10px;
-        }
-
-        .sheet-header {
-            background-color: #ffff00;
             color: #000;
-            font-weight: 800;
-            font-size: 16px;
-            padding: 10px;
-            text-align: center;
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .notes-section {
-            text-align: right;
-            padding: 10px;
-            font-size: 13px;
-            line-height: 1.6;
+            white-space: nowrap;
+            z-index: 10;
         }
     </style>
 </head>
@@ -189,181 +62,203 @@
 
     <div class="container">
         <div class="top-bar">
-            <h2>إدارة واستخراج نماذج المقابلات الفنية</h2>
+            <h2>إدارة واستخراج نماذج المقابلات والتصاريح</h2>
             <a href="index.html" class="back-btn">العودة للرئيسية</a>
         </div>
 
         <div class="form-group">
-            <label>اختر ملف بيانات الموظفين (Excel):</label>
-            <div class="file-upload-wrapper" id="wrap">
-                <span id="fileText">📁 اختر ملف الإكسيل الذي يحتوي على بيانات الموظفين</span>
-                <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
+            <div class="label-container">
+                <label>الخطوة 1: حمل قالب الإكسيل المنظم:</label>
+                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>اختر نموذج المقابلة (حسب المهنة):</label>
-            <select id="jobTitleSelect">
-                <option value="معلم سقالة">معلم سقالة</option>
-                <option value="حداد">حداد</option>
-                <option value="ميكانيكي">ميكانيكي</option>
-                <option value="كهربائي">كهربائي</option>
-                <option value="الكل">جميع المهن (استخراج للجميع)</option>
-            </select>
+            <label>الخطوة 2: ارفع "صورة" النموذج الفارغ (JPG أو PNG):</label>
+            <div class="file-upload-wrapper" style="border-color: #8e44ad; background-color: #fbf5ff;">
+                <span id="bgImageText" style="color: #8e44ad;">🖼️ اضغط هنا لاختيار صورة النموذج</span>
+                <input type="file" id="bgImage" accept="image/png, image/jpeg" onchange="handleBgImage(this)">
+            </div>
         </div>
 
-        <button class="btn" onclick="generateForms()">🔍 توليد ومعاينة النماذج</button>
+        <div class="form-group">
+            <label>الخطوة 3: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
+            <div class="file-upload-wrapper">
+                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
+                <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
+            </div>
+        </div>
 
-        <!-- معاينة النماذج -->
+        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية</button>
+        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
+
         <div id="previewContainer">
-            <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;">معاينة النماذج قبل الطباعة أو التصدير</h3>
+            <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 تصدير النماذج إلى ملف Word جاهز للطباعة (.docx)</button>
+            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 طباعة النماذج أو حفظها (Ctrl+P)</button>
         </div>
     </div>
 
     <script>
         let loadedEmployees = [];
+        let bgImageUrl = '';
+
+        // إحداثيات الكلمات الثابتة المدمجة
+        let basePositions = {
+            'f-name': { top: 23.15, right: 26.10 },
+            'f-nat': { top: 26.74, right: 37.96 },
+            'f-id': { top: 30.41, right: 35.54 },
+            'f-exp': { top: 34.10, right: 54.72 },
+            'f-job1': { top: 38.03, right: 34.08 },
+            'f-job2': { top: 37.87, right: 56.75 },
+            'f-comp': { top: 45.47, right: 34.99 },
+            'f-spon': { top: 52.54, right: 48.04 },
+            'f-phone': { top: 59.29, right: 39.54 },
+        };
+
+        const jobCriteria = {
+            "معلم سقالة": ["تركيب وفك السقالات", "معايير السلامة", "العمل على الارتفاعات", "قراءة تعليمات الموقع"],
+            "سباك": ["قراءة المخططات الصحية", "تركيب المواسير والتوصيلات", "كشف التسريبات والصيانة", "استخدام العدد والأدوات", "الالتزام بالسلامة"],
+            "فني دكت": ["تركيب دكت", "استخدام العدد والادوات", "السلامة المهنية", "قراءة المخططات"],
+            "كهربائي": ["قراءة المخططات الكهربائية", "التمديدات الكهربائية", "تركيب القواطع واللوحات", "اكتشاف الأعطال", "الالتزام بإجراءات السلامة"],
+            "عامل": ["الكفاءة المهنية العامة", "الالتزام بتعليمات الموقع", "معايير السلامة المهنية"]
+        };
+
+        function formatExcelDate(serial) {
+            if (!serial) return "";
+            if (typeof serial === "string") return serial;
+            if (!isNaN(serial)) {
+                let utc_days  = Math.floor(serial - 25569);
+                let utc_value = utc_days * 86400;
+                let date_info = new Date(utc_value * 1000);
+                let y = date_info.getFullYear();
+                let m = String(date_info.getMonth() + 1).padStart(2, '0');
+                let d = String(date_info.getDate()).padStart(2, '0');
+                return `${y}/${m}/${d}`;
+            }
+            return serial;
+        }
+
+        async function downloadTemplate() {
+            try {
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('بيانات الموظفين', { views: [{ rightToLeft: true }] });
+                worksheet.columns = [
+                    { width: 6 },  { width: 30 }, { width: 20 }, { width: 20 },
+                    { width: 15 }, { width: 20 }, { width: 20 }, { width: 15 },
+                    { width: 20 }, { width: 15 }, { width: 30 }
+                ];
+                worksheet.addTable({
+                    name: 'EmployeesTable', ref: 'A1', headerRow: true,
+                    style: { theme: 'TableStyleLight9', showRowStripes: true },
+                    columns: [
+                        {name: 'م', filterButton: true}, {name: 'الاسم', filterButton: true}, {name: 'المهنة', filterButton: true},
+                        {name: 'المهنة في الهوية', filterButton: true}, {name: 'الجنسية', filterButton: true}, {name: 'رقم الهوية', filterButton: true},
+                        {name: 'تاريخ انتهاء الهوية', filterButton: true}, {name: 'تاريخ الميلاد', filterButton: true}, {name: 'رقم الجوال', filterButton: true},
+                        {name: 'الصورة', filterButton: true}, {name: 'اسم الكفيل', filterButton: true}
+                    ],
+                    rows: Array.from({length: 50}, (_, i) => [i + 1, "", "", "", "", "", "", "", "", "", ""])
+                });
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
+        }
+
+        function handleBgImage(input) {
+            const file = input.files[0];
+            if (file) {
+                document.getElementById('bgImageText').innerText = `✔ تم اختيار الصورة بنجاح`;
+                const reader = new FileReader();
+                reader.onload = function(e) { bgImageUrl = e.target.result; }
+                reader.readAsDataURL(file);
+            }
+        }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔️ تم اختيار: ${file.name}`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                    loadedEmployees = XLSX.utils.sheet_to_json(sheet, { defval: "" });
-                    alert(`تم تحميل بيانات ${loadedEmployees.length} موظف بنجاح!`);
+                    loadedEmployees = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
                 };
                 reader.readAsArrayBuffer(file);
             }
         }
 
-        function generateForms() {
-            if (loadedEmployees.length === 0) {
-                alert("الرجاء رفع ملف الإكسيل أولاً!");
-                return;
-            }
+        function generateAllForms() {
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            renderForms('interview');
+        }
 
-            const selectedJob = document.getElementById('jobTitleSelect').value;
+        function generatePermits() {
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            if (!bgImageUrl) { alert("يرجى رفع صورة النموذج (الخطوة 2) لكي نكتب البيانات فوقها!"); return; }
+            renderForms('permit');
+        }
+
+        function renderForms(type) {
             const viewContainer = document.getElementById('sheetsView');
             viewContainer.innerHTML = '';
+            let generatedCount = 0;
 
-            let filtered = loadedEmployees.filter(emp => {
-                let job = String(emp['المهنه'] || emp['المهنة'] || '').trim();
-                return selectedJob === 'الكل' || job === selectedJob;
-            });
+            for (let i = 1; i < loadedEmployees.length; i++) {
+                let row = loadedEmployees[i];
+                if (!row || row.length === 0) continue;
 
-            if (filtered.length === 0) {
-                alert("لا يوجد موظفين مطابقين لهذه المهنة في الملف المرفوع.");
-                return;
-            }
+                let name = String(row[1] || '').trim();
+                if (!name || name === 'الاسم') continue;
 
-            filtered.forEach(emp => {
-                let name = emp['الإســــــــــم'] || emp['الاسم'] || '';
-                let idNum = emp['رقم الهويه'] || emp['رقم الإقامة'] || '';
-                let phone = emp['رقم الجوال'] || '';
-                let nationality = emp['الجنسيه'] || emp['الجنسية'] || '';
-                let birthDate = emp['تاريخ الميلاد'] || '';
-                let expDate = emp['تاريخ انتهاء الاقامة'] || '';
+                let currentJob = String(row[2] || 'عامل').trim();
+                let idJob = String(row[3] || '').trim();
+                let nationality = String(row[4] || '');
+                let idNum = String(row[5] || '');
+                let expDate = formatExcelDate(row[6]);
+                let birthDate = formatExcelDate(row[7]);
+                let phone = String(row[8] || '');
+                let sponsorName = String(row[10] || '');
+
+                if (!currentJob) currentJob = 'عامل';
                 let today = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
 
-                let html = `
-                    <div class="interview-sheet">
-                        <div class="sheet-header">نموذج مقابلة شخصية - ${selectedJob === 'الكل' ? (emp['المهنه'] || 'فني') : selectedJob}</div>
-                        <table class="sheet-table">
-                            <tr>
-                                <td style="width: 15%; font-weight: bold;">الاسم</td>
-                                <td style="width: 35%;">${name}</td>
-                                <td style="width: 15%; font-weight: bold;">تاريخ المقابلة</td>
-                                <td style="width: 35%;">${today}</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold;">رقم الهوية/الإقامة</td>
-                                <td>${idNum}</td>
-                                <td style="font-weight: bold;">رقم الجوال</td>
-                                <td>${phone}</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold;">تاريخ انتهاء الاقامة</td>
-                                <td>${expDate}</td>
-                                <td style="font-weight: bold;">اسم الشركة</td>
-                                <td>شركة البحيرات الدولية</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold;">الجنسية</td>
-                                <td>${nationality}</td>
-                                <td style="font-weight: bold;">تاريخ الميلاد</td>
-                                <td>${birthDate}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" style="background:#f9f9f9; text-align:right; font-weight:600; padding: 6px 10px;">
-                                    أتعهد أنا شركة/ شركة البحيرات الدولية بأن جميع البيانات الموضحة أعلاه صحيحة وفى حالة ثبوت غير ذلك يتم التعامل حسب الأنظمة المتبعة بالمشروع.
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="font-weight: bold;">ختم الشركة /</td>
-                                <td colspan="2" style="font-weight: bold;">التوقيع /</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold; background:#eee;">البند</td>
-                                <td style="font-weight: bold; background:#eee;">التقييم</td>
-                                <td colspan="2" style="font-weight: bold; background:#eee;">ملاحظات</td>
-                            </tr>
-                            <tr>
-                                <td>تركيب وفك السقالات</td>
-                                <td></td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td>معايير السلامة</td>
-                                <td></td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td>العمل على الارتفاعات</td>
-                                <td></td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td>قراءة تعليمات الموقع</td>
-                                <td></td>
-                                <td colspan="2"></td>
-                            </tr>
-                            <tr>
-                                <td colspan="4" style="font-weight: bold; background:#fafafa;">اعتماد المقابلة الشخصية</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold;">المهندس المسئول</td>
-                                <td colspan="3" style="text-align: right; padding-right: 15px;">الاسم: ....................................... &nbsp;&nbsp;&nbsp;&nbsp; التوقيع: .......................................</td>
-                            </tr>
-                            <tr>
-                                <td style="font-weight: bold;">القرار النهائي</td>
-                                <td colspan="3" style="text-align: right; padding-right: 15px;">
-                                    [ &nbsp; ] مقبول &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ &nbsp; ] مرفوض
-                                </td>
-                            </tr>
-                        </table>
-                        <div class="notes-section">
-                            * ارفاق صورة من هوية مقيم (ابشر) مختومة بختم الشركة.<br>
-                            * ارفاق عقد اجير ومايثبت العلاقة مع الموظف مختوم بختم الشركة.<br>
-                            * وفي حالة تواجد عقد مع شركة اخرى يكون موثق غرفة تجارية.
-                        </div>
-                    </div>
-                `;
-                viewContainer.innerHTML += html;
-            });
+                if (type === 'interview') {
+                    let criteriaList = jobCriteria[currentJob] || jobCriteria["عامل"];
+                    let criteriaRows = '';
+                    criteriaList.forEach(criterion => { criteriaRows += `<tr><td style="font-weight: 600;">${criterion}</td><td></td><td colspan="2"></td></tr>`; });
 
-            document.getElementById('previewContainer').style.display = 'block';
-            document.getElementById('downloadWordBtn').style.display = 'block';
-        }
-
-        function exportToWord() {
-            alert("تم إعداد خاصية التصدير، سيتم حفظ ملف الوورد المخصص للطباعة فوراً.");
-            // ملاحظة: تتيح لك المكتبة دمج النماذج وتوليدها بملف Docx لتعديلها في برنامج Word بمرونة تامة.
-        }
-    </script>
-</body>
-</html>
+                    viewContainer.innerHTML += `
+                        <div class="interview-sheet">
+                            <div class="sheet-header">نموذج مقابلة شخصية - ${currentJob}</div>
+                            <table class="sheet-table">
+                                <tr>
+                                    <td class="photo-cell" rowspan="5">صورة الموظف</td>
+                                    <td style="width: 20%; font-weight: bold; background: #fdfdfd;">الاسم</td>
+                                    <td style="width: 30%;">${name}</td>
+                                    <td style="width: 15%; font-weight: bold; background: #fdfdfd;">تاريخ المقابلة</td>
+                                    <td style="width: 20%;">${today}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; background: #fdfdfd;">رقم الهوية/الإقامة</td>
+                                    <td>${idNum}</td>
+                                    <td style="font-weight: bold; background: #fdfdfd;">رقم الجوال</td>
+                                    <td>${phone}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; background: #fdfdfd;">تاريخ انتهاء الاقامة</td>
+                                    <td>${expDate}</td>
+                                    <td style="font-weight: bold; background: #fdfdfd;">اسم الشركة</td>
+                                    <td style="background: #fdfdfd;">شركة البحيرات الدولية</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; background: #fdfdfd;">الجنسية</td>
+                                    <td>${nationality}</td>
+                                    <td style="font-weight: bold; background: #fdfdfd;">تاريخ الميلاد</td>
+                                    <td style="background: #fdfdfd;">${birthDate}</td>
+                                </tr>
+                                <tr>
+                                    <td style="font-weight: bold; background: #fdfdfd;">المهنة في الهوية</td>
+                                    <td>${idJob}</td>
+                                    <td style="font-weight: bold; background: #
