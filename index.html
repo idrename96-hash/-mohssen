@@ -3,503 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام دمج وحساب الرواتب | البحيرات الدولية</title>
-    
-    <!-- استدعاء الخط العربي Cairo -->
+    <title>البحيرات الدولية | الصفحة الرئيسية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- مكتبات معالجة الإكسيل -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    
     <style>
         :root {
             --primary: #1e3c72;
             --primary-light: #2a5298;
             --accent: #00b09b;
-            --accent-hover: #008374;
             --bg-color: #f0f2f5;
             --card-bg: #ffffff;
             --text-dark: #333333;
             --text-gray: #666666;
             --border-color: #e1e4e8;
-            --bank-color: #f39c12;
         }
 
         body {
             font-family: 'Cairo', sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding: 10px;
+            padding: 20px;
             color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            width: 100%;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 40px;
         }
 
         .header h1 {
             color: var(--primary);
             font-weight: 800;
             margin: 0;
-            font-size: 24px;
+            font-size: 38px;
         }
 
         .header p {
             color: var(--text-gray);
-            margin-top: 5px;
-            font-size: 14px;
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .services-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
         }
 
         .card {
             background-color: var(--card-bg);
-            border-radius: 12px;
+            border-radius: 15px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-            padding: 15px;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
-
-        /* تخطيط متجاوب للشاشات الصغيرة */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .grid-2 {
-                grid-template-columns: 1fr 1fr;
-            }
-            body { padding: 20px; }
-            .card { padding: 30px; }
-            .header h1 { font-size: 32px; }
-        }
-
-        .input-group {
+            padding: 25px;
+            text-align: center;
+            transition: 0.3s;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--text-dark);
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
-        .input-group label {
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--primary);
-            font-size: 14px;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .input-group input[type="number"] {
-            padding: 10px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 15px;
-            outline: none;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .input-group input[type="file"] {
-            font-family: 'Cairo', sans-serif;
-            font-size: 14px;
-            padding: 8px;
-            border: 2px dashed var(--border-color);
-            border-radius: 8px;
-            background-color: #fafafa;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .btn {
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
             background: linear-gradient(to left, var(--primary), var(--primary-light));
             color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-family: 'Cairo', sans-serif;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            margin-bottom: 15px;
             transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
         }
 
-        .btn:active { transform: scale(0.98); }
-
-        .btn-success {
+        .card:hover .icon-circle {
             background: linear-gradient(to left, var(--accent), #1de9b6);
-            box-shadow: 0 4px 15px rgba(0, 176, 155, 0.2);
-            margin-top: 20px;
-            display: none;
         }
 
-        .status {
-            text-align: center;
-            margin-top: 15px;
-            font-weight: 600;
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 22px;
+            color: var(--primary);
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--text-gray);
             font-size: 14px;
         }
 
-        .status.error { color: #e74c3c; }
-        .status.success { color: var(--accent); }
-        .status.loading { color: var(--primary-light); }
-
-        /* تنسيقات الجدول المتجاوب */
-        .table-responsive {
-            overflow-x: auto;
-            max-height: 450px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            display: none;
-            margin-top: 20px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            white-space: nowrap;
-            font-size: 13px;
-        }
-
-        thead {
-            background-color: var(--primary);
-            color: white;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        th, td {
-            padding: 10px 12px;
+        .footer {
+            margin-top: auto;
             text-align: center;
-            border-bottom: 1px solid #eee;
-            border-left: 1px solid #eee;
+            color: var(--text-gray);
+            font-size: 14px;
+            padding-top: 40px;
         }
-
-        th { font-weight: 600; }
-        
-        tbody tr:nth-child(even) { background-color: #fcfcfc; }
-        
-        .highlight-col { background-color: #e6f7f5; font-weight: 600; color: var(--accent-hover); }
-        .currency-col { background-color: #fff8e1; color: #d35400; font-weight: 700; }
-        .total-row { background-color: var(--primary-light) !important; color: white !important; font-weight: bold; }
-
-        #bankSummary {
-            display: none;
-            margin-top: 25px;
-            border-top: 3px dashed var(--bank-color);
-            padding-top: 15px;
-        }
-        .bank-title { color: var(--bank-color); text-align: center; margin-bottom: 15px; font-size: 18px; font-weight: 800;}
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 10px; }
-        .summary-box { background: #fffdfa; padding: 10px; border-radius: 8px; text-align: center; border: 1px solid #fae5d3; }
-        .summary-box .title { display: block; color: #666; font-size: 12px; font-weight: 600;}
-        .summary-box .count { display: block; font-size: 20px; color: var(--bank-color); margin-top: 3px; font-weight: 800;}
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>📊 نظام الرواتب والفئات</h1>
-        <p>شركة البحيرات الدولية</p>
+    <div class="container">
+        <div class="header">
+            <h1>شركة البحيرات الدولية</h1>
+            <p>حلول متكاملة لإدارة الأعمال والخدمات الرقمية</p>
+        </div>
+
+        <div class="services-grid">
+            <a href="payroll.html" class="card">
+                <div class="icon-circle">📊</div>
+                <h3>نظام الرواتب والفئات</h3>
+                <p>إدارة كشوفات الحضور وحساب الرواتب والفئات النقدية</p>
+            </a>
+
+            <a href="iqama.html" class="card">
+                <div class="icon-circle">📄</div>
+                <h3>قراءة وتحديث الإقامات</h3>
+                <p>نظام استخراج وقراءة بيانات الإقامات والمستندات</p>
+            </a>
+        </div>
     </div>
 
-    <div class="card">
-        <h3 style="margin-top:0; color:var(--primary); font-size: 16px;">1. إعدادات الحساب</h3>
-        <div class="grid-2">
-            <div class="input-group">
-                <label>أجر ساعة العامل (ريال)</label>
-                <input type="number" id="rateWorker" value="12" min="1" step="0.5">
-            </div>
-            <div class="input-group">
-                <label>أجر ساعة المهن الأخرى (ريال)</label>
-                <input type="number" id="rateOther" value="16" min="1" step="0.5">
-            </div>
-        </div>
-
-        <h3 style="color:var(--primary); font-size: 16px;">2. ملفات الحضور</h3>
-        <div class="grid-2">
-            <div class="input-group">
-                <label>النصف الأول (يوم 1 إلى 15)</label>
-                <input type="file" id="fileHalf1" accept=".xlsx, .xls">
-            </div>
-            <div class="input-group">
-                <label>النصف الثاني (يوم 16 إلى 31)</label>
-                <input type="file" id="fileHalf2" accept=".xlsx, .xls">
-            </div>
-        </div>
-
-        <button class="btn" onclick="processFiles()">⚙️ دمج، حساب الفئات وتجهيز الكشف</button>
-        <div id="status" class="status"></div>
-
-        <!-- خلاصة البنك -->
-        <div id="bankSummary">
-            <h3 class="bank-title">🏦 طلبية السحب النقدي من البنك</h3>
-            <h4 style="text-align: center; margin-top: 0; color: var(--primary); font-size: 14px;" id="grandTotalText"></h4>
-            <div class="summary-grid" id="summaryGrid"></div>
-        </div>
-
-        <!-- معاينة الجدول -->
-        <div class="table-responsive" id="tableWrapper">
-            <table id="previewTable">
-                <thead><tr id="tableHead"></tr></thead>
-                <tbody id="tableBody"></tbody>
-            </table>
-        </div>
-
-        <button id="downloadBtn" class="btn btn-success" onclick="downloadExcel()">📥 تحميل كشف الرواتب النهائي (Excel)</button>
+    <div class="footer">
+        &copy; 2026 البحيرات الدولية. جميع الحقوق محفوظة.
     </div>
 
-<script>
-    let globalFinalData = [];
-    let globalCols = [];
-    const denominations = [500, 200, 100, 50, 10, 5, 1];
-    let bankTotals = {};
-
-    function showStatus(message, type = 'loading') {
-        const statusEl = document.getElementById('status');
-        statusEl.innerText = message;
-        statusEl.className = `status ${type}`;
-    }
-
-    function readExcelFile(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { range: 1, defval: "" });
-                    resolve(jsonData);
-                } catch (err) {
-                    reject(new Error("خطأ في قراءة ملف الإكسيل."));
-                }
-            };
-            reader.onerror = () => reject(new Error("فشل تحميل الملف."));
-            reader.readAsArrayBuffer(file);
-        });
-    }
-
-    async function processFiles() {
-        const file1 = document.getElementById('fileHalf1').files[0];
-        const file2 = document.getElementById('fileHalf2').files[0];
-        const rateWorker = parseFloat(document.getElementById('rateWorker').value);
-        const rateOther = parseFloat(document.getElementById('rateOther').value);
-
-        if (!file1 || !file2) {
-            showStatus("⚠️ يرجى اختيار ملفي النصف الأول والثاني أولاً.", "error");
-            return;
-        }
-
-        showStatus("⏳ جاري المعالجة، يرجى الانتظار...", "loading");
-        document.getElementById('tableWrapper').style.display = 'none';
-        document.getElementById('downloadBtn').style.display = 'none';
-        document.getElementById('bankSummary').style.display = 'none';
-
-        try {
-            const [dataHalf1, dataHalf2] = await Promise.all([readExcelFile(file1), readExcelFile(file2)]);
-            let employees = {};
-
-            function processHalf(data, isFirstHalf) {
-                data.forEach(row => {
-                    let id = String(row['رقم الهويه'] || '').trim().replace(/\.0$/, '');
-                    let name = String(row['الإســــــــــم'] || '').trim();
-                    if (!id || id === 'undefined' || !name || name === 'undefined' || name === 'nan') return;
-
-                    if (!employees[id]) employees[id] = { 'رقم الهويه': id, 'الإســــــــــم': name };
-
-                    ['الرقم الوظيفي ', 'الجنسيه', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'].forEach(col => {
-                        if (row[col]) employees[id][col] = row[col];
-                    });
-
-                    let prof = String(row['المهنه'] || '').trim();
-                    let hours = parseFloat(row['ساعات العمل']) || 0;
-
-                    if (isFirstHalf) {
-                        employees[id]['المهنة (من 1 إلى 15)'] = prof;
-                        employees[id]['ساعات العمل (من 1 إلى 15)'] = hours;
-                        for (let i = 1; i <= 15; i++) if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
-                    } else {
-                        employees[id]['المهنة (من 16 إلى 31)'] = prof;
-                        employees[id]['ساعات العمل (من 16 إلى 31)'] = hours;
-                        for (let i = 16; i <= 31; i++) if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
-                    }
-                });
-            }
-
-            processHalf(dataHalf1, true);
-            processHalf(dataHalf2, false);
-
-            const standardCols = ['رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
-            const dayCols = Array.from({length: 31}, (_, i) => String(i + 1));
-            const finalCols = ['ساعات العمل (من 1 إلى 15)', 'ساعات العمل (من 16 إلى 31)', 'إجمالي ساعات الشهر', 'راتب النصف الأول (ريال)', 'راتب النصف الثاني (ريال)', 'إجمالي الراتب المستحق (ريال)'];
-            const currencyCols = denominations.map(d => `فئة ${d}`);
-            
-            globalCols = [...standardCols, ...dayCols, ...finalCols, ...currencyCols];
-            globalFinalData = [];
-
-            bankTotals = { sum: 0 };
-            denominations.forEach(d => bankTotals[d] = 0);
-
-            Object.values(employees).forEach(emp => {
-                let row = {};
-                standardCols.forEach(col => row[col] = emp[col] || '');
-                dayCols.forEach(col => row[col] = emp[col] !== undefined ? emp[col] : '');
-
-                let h1 = parseFloat(emp['ساعات العمل (من 1 إلى 15)']) || 0;
-                let h2 = parseFloat(emp['ساعات العمل (من 16 إلى 31)']) || 0;
-                let p1 = String(emp['المهنة (من 1 إلى 15)'] || '');
-                let p2 = String(emp['المهنة (من 16 إلى 31)'] || '');
-
-                row['ساعات العمل (من 1 إلى 15)'] = h1 || '';
-                row['ساعات العمل (من 16 إلى 31)'] = h2 || '';
-                row['إجمالي ساعات الشهر'] = h1 + h2;
-
-                let s1 = h1 * (p1 === 'عامل' ? rateWorker : rateOther);
-                let s2 = h2 * (p2 === 'عامل' ? rateWorker : rateOther);
-                let totalSalary = Math.round(s1 + s2); 
-
-                row['راتب النصف الأول (ريال)'] = s1;
-                row['راتب النصف الثاني (ريال)'] = s2;
-                row['إجمالي الراتب المستحق (ريال)'] = totalSalary;
-                bankTotals.sum += totalSalary;
-
-                let remaining = totalSalary;
-                denominations.forEach(denom => {
-                    let count = Math.floor(remaining / denom);
-                    row[`فئة ${denom}`] = count > 0 ? count : ''; 
-                    bankTotals[denom] += count;
-                    remaining = remaining % denom;
-                });
-
-                globalFinalData.push(row);
-            });
-
-            let totalRow = {};
-            globalCols.forEach(col => totalRow[col] = '');
-            totalRow['الإســــــــــم'] = 'الإجمالي الكلي (للسحب البنكي)';
-            totalRow['إجمالي الراتب المستحق (ريال)'] = bankTotals.sum;
-            denominations.forEach(denom => {
-                totalRow[`فئة ${denom}`] = bankTotals[denom] > 0 ? bankTotals[denom] : '';
-            });
-            globalFinalData.push(totalRow);
-
-            renderBankSummary();
-            renderTablePreview();
-            showStatus("✅ تمت المعالجة بنجاح!", "success");
-
-        } catch (error) {
-            console.error(error);
-            showStatus("❌ حدث خطأ أثناء المعالجة.", "error");
-        }
-    }
-
-    function renderBankSummary() {
-        document.getElementById('grandTotalText').innerText = `إجمالي المطلوب سحبه: ${bankTotals.sum.toLocaleString()} ريال`;
-        const grid = document.getElementById('summaryGrid');
-        grid.innerHTML = '';
-        denominations.forEach(denom => {
-            const count = bankTotals[denom];
-            const div = document.createElement('div');
-            div.className = 'summary-box';
-            div.innerHTML = `<span class="title">فئة ${denom}</span><span class="count">${count}</span>`;
-            grid.appendChild(div);
-        });
-        document.getElementById('bankSummary').style.display = 'block';
-    }
-
-    function renderTablePreview() {
-        const thead = document.getElementById('tableHead');
-        const tbody = document.getElementById('tableBody');
-        thead.innerHTML = ''; tbody.innerHTML = '';
-
-        globalCols.forEach(col => {
-            const th = document.createElement('th');
-            th.textContent = col;
-            thead.appendChild(th);
-        });
-
-        const displayData = globalFinalData.slice(0, 50);
-        if(globalFinalData.length > 50) displayData.push(globalFinalData[globalFinalData.length - 1]); 
-        
-        displayData.forEach(row => {
-            const tr = document.createElement('tr');
-            const isTotalRow = row['الإســــــــــم'] === 'الإجمالي الكلي (للسحب البنكي)';
-            if (isTotalRow) tr.className = 'total-row';
-
-            globalCols.forEach(col => {
-                const td = document.createElement('td');
-                td.textContent = row[col];
-                if (!isTotalRow && col === 'إجمالي الراتب المستحق (ريال)') td.className = 'highlight-col';
-                if (!isTotalRow && String(col).startsWith('فئة')) td.className = 'currency-col';
-                tr.appendChild(td);
-            });
-            tbody.appendChild(tr);
-        });
-
-        document.getElementById('tableWrapper').style.display = 'block';
-        document.getElementById('downloadBtn').style.display = 'block';
-    }
-
-    async function downloadExcel() {
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet('كشف الرواتب', { views: [{ rightToLeft: true }] });
-
-        worksheet.columns = globalCols.map(col => ({ header: col, key: col }));
-
-        worksheet.getRow(1).eachCell(cell => {
-            cell.font = { bold: true };
-            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD7E4BC' } };
-            cell.alignment = { vertical: 'middle', horizontal: 'center' };
-            cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-        });
-
-        globalFinalData.forEach(rowData => {
-            const row = worksheet.addRow(rowData);
-            const isTotalRow = rowData['الإســــــــــم'] === 'الإجمالي الكلي (للسحب البنكي)';
-            
-            row.eachCell((cell, colNumber) => {
-                cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                cell.border = { top: {style:'thin'}, left: {style:'thin'}, bottom: {style:'thin'}, right: {style:'thin'} };
-                const colName = globalCols[colNumber - 1];
-
-                if (isTotalRow) {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2A5298' } };
-                    cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-                } else {
-                    if (colName === 'إجمالي الراتب المستحق (ريال)') {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE6F7F5' } };
-                        cell.font = { bold: true, color: {argb: 'FF008374'} };
-                    }
-                    if (colName.startsWith('فئة')) {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF8E1' } };
-                        if(cell.value) cell.font = { bold: true, color: {argb: 'FFD35400'} };
-                    }
-                }
-            });
-        });
-
-        worksheet.columns.forEach(column => {
-            let maxLen = column.header ? column.header.toString().length : 10;
-            column.eachCell({ includeEmpty: true }, cell => {
-                if (cell.value) {
-                    const len = cell.value.toString().length;
-                    if (len > maxLen) maxLen = len;
-                }
-            });
-            column.width = maxLen * 1.3; 
-        });
-
-        const buffer = await workbook.xlsx.writeBuffer();
-        saveAs(new Blob([buffer]), "كشف_الرواتب_والفئات_البنكية.xlsx");
-    }
-</script>
 </body>
 </html>
