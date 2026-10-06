@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>قارئ الإقامة السعودية - الإصدار الموحد v10.30</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0E1F1C; --teal:#12332E; --teal2:#1B4A42; --gold:#C9A227;
+    --gold-soft:#E4C868; --paper:#F6F2E7; --line:#2E5A51;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; min-height:100vh; background:var(--ink); color:var(--paper);
+    font-family:'Tajawal',sans-serif; padding:24px 16px 60px;
+  }
+  .wrap{max-width:750px; margin:0 auto;}
+  h1{font-size:22px; font-weight:900; margin:0 0 4px; color:var(--gold-soft);}
+  .sub{font-size:14px; color:#B9CFC9; margin:0 0 8px; line-height:1.7;}
+  .note{font-size:12px; color:#9FC2BB; line-height:1.7; margin-top:6px;}
+  .card{
+    background:var(--teal); border:1px solid var(--line); border-radius:14px;
+    padding:20px; margin-bottom:16px;
+  }
+  .btn-row{display:flex; gap:10px; flex-wrap:wrap;}
+  label.btn, button{
+    flex:1; min-width:130px; text-align:center; cursor:pointer;
+    background:var(--teal2); color:var(--paper); border:1px solid var(--line);
+    border-radius:10px; padding:13px 10px; font-family:inherit; font-size:14px;
+    font-weight:500; transition:background .15s;
+  }
+  label.btn:active, button:active{background:var(--gold); color:var(--ink);}
+  input[type=file]{display:none;}
+  input[type=password], input[type=text], textarea{
+    width:100%; background:var(--ink); color:var(--paper); border:1px solid var(--line);
+    border-radius:8px; padding:11px 12px; font-family:inherit; font-size:14px; direction:ltr; text-align:left;
+  }
+  button.primary{background:var(--gold); color:var(--ink); font-weight:700; border:none;}
+  button.success{background:#2E7D32; color:#fff; font-weight:700; border:none;}
+  button.info{background:#0277BD; color:#fff; font-weight:700; border:none;}
+  button.danger{background:#C62828; color:#fff; font-weight:700; border:none;}
+  button.small{flex:none; min-width:auto; padding:11px 16px;}
+  button:disabled{opacity:.5; cursor:not-allowed;}
+  #progWrap{display:none; margin-top:14px;}
+  #progBar{height:8px; background:#0006; border-radius:4px; overflow:hidden;}
+  #progFill{height:100%; width:0%; background:var(--gold); transition:width .2s;}
+  #progLabel{font-size:13px; color:#B9CFC9; margin-top:8px; text-align:center;}
+  table{width:100%; border-collapse:collapse; margin-top:10px; font-size:12px;}
+  th, td{border:1px solid var(--line); padding:8px; text-align:right;}
+  th{background:var(--teal2); color:var(--gold-soft);}
+  .table-container{max-height:320px; overflow-y:auto; margin-top:10px;}
+  a{color:var(--gold-soft);}
+  #keySaved, #sheetUrlSaved{display:none;}
+  .key-row{display:flex; gap:8px;}
+  #folderStatus{font-size:13px; color:var(--gold-soft); margin-top:8px;}
+  
+  /* تصميم العداد المركزي */
+  #globalCounter {
+    background: #0d1b18; border: 1px solid var(--gold); border-radius: 8px;
+    padding: 12px; text-align: center; margin-bottom: 16px; display: none;
+  }
+  #globalCounter span { font-size: 20px; font-weight: bold; color: var(--gold); }
+  
+  #camModal{display:none; position:fixed; inset:0; background:#000c; z-index:999; align-items:center; justify-content:center; padding:16px;}
+  .cam-box{background:var(--teal); border:1px solid var(--line); border-radius:14px; padding:16px; max-width:500px; width:100%; text-align:center;}
+  video{width:100%; max-height:350px; background:#000; border-radius:8px; object-fit:cover;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>قارئ الإقامة السعودية (v10.30)</h1>
+  <p class="sub">إصدار الفريق: متصل بقاعدة البيانات مع عداد مركزي للاستهلاك.</p>
+
+  <div class="card" id="keyCard">
+    <div class="field">
+      <div class="k" style="font-size:12px; color:#9FC2BB; margin-bottom:3px;">مفاتيح OCR.space API (مجانية) — كل مفتاح على سطر منفصل</div>
+      <textarea id="apiKey" placeholder="مفتاح1&#10;مفتاح2&#10;مفتاح3" style="width:100%; min-height:70px; resize:vertical;"></textarea>
+      <div class="key-row" style="margin-top:8px;">
+        <button class="small" id="saveKey">حفظ المفاتيح</button>
+      </div>
+      <div class="note" id="keySaved">✔ المفاتيح محفوظة</div>
+    </div>
+  </div>
+
+  <div class="card" id="sheetCard">
+    <div class="field">
+      <div class="k" style="font-size:12px; color:#9FC2BB; margin-bottom:3px;">رابط Google Sheet المشترك (Web App URL)</div>
+      <div class="key-row">
+        <input type="text" id="sheetUrl" placeholder="https://script.google.com/macros/s/.../exec">
+        <button class="small" id="saveSheetUrl">حفظ</button>
+      </div>
+      <div class="note" id="sheetUrlSaved">✔ الرابط محفوظ</div>
+      <div class="note" id="sheetSyncStatus" style="font-weight:700; margin-top:6px;"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="globalCounter">
+       إجمالي استهلاك الفريق اليوم: <br>
+       <span id="counterValue">... جاري التحميل ...</span>
+    </div>
+
+    <div class="btn-row">
+      <label class="btn" for="folderInput">📁 مجلد صور</label>
+      <label class="btn" for="fileInput">🖼️ صور متعددة / فردية</label>
+      <button class="primary" id="openCamBtn">📷 فتح الكاميرا</button>
+      <button class="danger" id="stopBtn" style="display:none;">🛑 إيقاف وحفظ</button>
+    </div>
+    
+    <input id="folderInput" type="file" webkitdirectory directory multiple accept="image/*,.jpeg,.jpg,.png,.webp">
+    <input id="fileInput" type="file" multiple accept="image/*,.jpeg,.jpg,.png,.webp">
+    
+    <div id="folderStatus"></div>
+    
+    <div id="progWrap">
+      <div id="progBar"><div id="progFill"></div></div>
+      <div id="progLabel" style="margin-top:8px; text-align:center;">جاري المعالجة...</div>
+    </div>
+  </div>
+
+  <div class="card" id="resultsCard" style="display:none;">
+    <h3 style="margin-top:0; color:var(--gold-soft);">النتائج المستخرجة (<span id="countSpan">0</span> صور)</h3>
+    <div class="table-container">
+      <table id="resTable">
+        <thead>
+          <tr>
+            <th>م</th>
+            <th>الاسم بالعربي</th>
+            <th>الاسم بالإنجليزية</th>
+            <th>رقم الهوية</th>
+            <th>تاريخ الميلاد</th>
+            <th>الانتهاء</th>
+            <th>الجنسية</th>
+            <th>المهنة</th>
+            <th>صاحب العمل</th>
+            <th>هوية صاحب العمل</th>
+            <th>ملاحظات</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+    <div style="display:flex; gap:10px; margin-top:16px; flex-wrap:wrap;">
+      <button class="success" id="downloadExcel" style="flex:1;">📥 تحميل شيت البيانات (CSV للجوال)</button>
+      <button class="info" id="downloadBat" style="flex:1;">⚙️ تحميل ملف التسمية (BAT)</button>
+    </div>
+  </div>
+
+  <div class="card" id="failedCard" style="display:none;">
+    <h3 style="margin-top:0; color:#EF9A9A;">الصور الفاشلة (<span id="failedCountSpan">0</span>)</h3>
+    <div class="table-container">
+      <table id="failedTable">
+        <thead>
+          <tr>
+            <th>اسم الملف</th>
+            <th>سبب الفشل</th>
+          </tr>
+        </thead>
+        <tbody id="failedBody"></tbody>
+      </table>
+    </div>
+    <div style="margin-top:16px;">
+      <button class="danger" id="downloadFailed" style="width:100%;">📥 تحميل قائمة الصور الفاشلة (Excel/CSV)</button>
+    </div>
+  </div>
+</div>
+
+<div id="camModal">
+  <div class="cam-box">
+    <h3 style="color:var(--gold-soft); margin-top:0;">التقاط صورة الهوية بالكاميرا</h3>
+    <video id="camVideo" autoplay playsinline></video>
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <button class="success" id="takePicBtn" style="flex:1;">📸 التقاط الصورة</button>
+      <button class="danger" id="closeCamBtn" style="flex:1;">❌ إغلاق</button>
+    </div>
+  </div>
+</div>
+
+<div style="text-align:center; font-size:11px; color:#5E7A73; margin-top:10px;">نسخة v10.30 الموحدة</div>
+
+<script>
+// ==========================================
+// الإعدادات والروابط المخفية
+// ==========================================
+const DEFAULT_KEYS = "K87179441288957\nK84766691388957\nK81752679988957\nK87880537988957\nK86651565288957\nK86983657888957\nK82398197588957\nK86929632588957\nK83762693988957\nK83895385988957";
+const DEFAULT_SHEET_URL = "";
+
+const IS_ADMIN = new URLSearchParams(location.search).get('admin') === '1';
+if(!IS_ADMIN){
+  document.getElementById('keyCard').style.display = 'none';
+  document.getElementById('sheetCard').style.display = 'none';
+}
+
+const apiKeyInput = document.getElementById('apiKey');
+const sheetUrlInput = document.getElementById('sheetUrl');
+apiKeyInput.value = localStorage.getItem('ocrspace_key') || DEFAULT_KEYS;
+sheetUrlInput.value = localStorage.getItem('ocrspace_sheet_url') || DEFAULT_SHEET_URL;
+
+document.getElementById('saveKey').addEventListener('click', () => {
+  localStorage.setItem('ocrspace_key', apiKeyInput.value.trim()); alert('تم الحفظ!');
+});
+document.getElementById('saveSheetUrl').addEventListener('click', () => {
+  localStorage.setItem('ocrspace_sheet_url', sheetUrlInput.value.trim()); alert('تم الحفظ!');
+  fetchGlobalCount(); // تحديث العداد بالرابط الجديد
+});
+
+// ==========================================
+// العداد المركزي (من الشيت)
+// ==========================================
+function fetchGlobalCount() {
+  const url = sheetUrlInput.value.trim();
+  if(!url) return;
+  
+  document.getElementById('globalCounter').style.display = 'block';
+  
+  // طلب JSONP لتخطي الـ CORS وجلب العداد
+  const script = document.createElement('script');
+  script.src = url + "?callback=updateGlobalCountUI&t=" + Date.now();
+  document.body.appendChild(script);
+}
+
+window.updateGlobalCountUI = function(data) {
+  if(data && data.count !== undefined) {
+    document.getElementById('counterValue').textContent = data.count + " صورة";
+  }
+};
+
+// تشغيل العداد فور فتح الصفحة
+window.addEventListener('load', fetchGlobalCount);
+
+// ==========================================
+// إرسال البيانات لجوجل شيت (مع تفادي الـ CORS)
+// ==========================================
+async function sendToSheet(type, payload){
+  const url = sheetUrlInput.value.trim();
+  const statusEl = document.getElementById('sheetSyncStatus');
+  if(!url) return;
+  try{
+    const formData = new URLSearchParams();
+    formData.append('data', JSON.stringify(Object.assign({ type }, payload)));
+
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+
+    statusEl.style.color = '#9FC2BB';
+    statusEl.textContent = '📤 تم الحفظ في قاعدة البيانات بنجاح';
+    
+    // تحديث العداد المركزي بعد كل إرسال
+    fetchGlobalCount();
+  }catch(e){
+    statusEl.style.color = '#EF5350';
+    statusEl.textContent = '❌ فشل الإرسال للقاعدة: ' + e.message;
+  }
+}
+
+// ==========================================
+// باقي أكواد التطبيق والمعالجة
+// ==========================================
+const folderInput = document.getElementById('folderInput');
+const fileInput = document.getElementById('fileInput');
+const openCamBtn = document.getElementById('openCamBtn');
+const camModal = document.getElementById('camModal');
+const camVideo = document.getElementById('camVideo');
+const takePicBtn = document.getElementById('takePicBtn');
+const closeCamBtn = document.getElementById('closeCamBtn');
+const folderStatus = document.getElementById('folderStatus');
+const progWrap = document.getElementById('progWrap');
+const progFill = document.getElementById('progFill');
+const progLabel = document.getElementById('progLabel');
+const stopBtn = document.getElementById('stopBtn');
+const resultsCard = document.getElementById('resultsCard');
+const tableBody = document.getElementById('tableBody');
+const countSpan = document.getElementById('countSpan');
+
+let processedData = [];
+let isCancelled = false;
+let selectedFiles = [];
+let mediaStream = null;
+let failedFiles = [];
+let keyPool = [];
+let keyRotationIndex = 0;
+
+function parseKeys(){ return apiKeyInput.value.split(/[\n,]+/).map(k => k.trim()).filter(Boolean); }
+
+function pickAvailableKey(){
+  const now = Date.now();
+  const available = keyPool.filter(k => k.cooldownUntil <= now);
+  if(available.length > 0){
+    const k = available[keyRotationIndex % available.length];
+    keyRotationIndex++; return k;
+  }
+  return keyPool.reduce((a, b) => a.cooldownUntil < b.cooldownUntil ? a : b);
+}
+
+folderInput.addEventListener('change', (e) => handleSelectedFiles(Array.from(e.target.files), 'مجلد'));
+fileInput.addEventListener('change', (e) => handleSelectedFiles(Array.from(e.target.files), 'صور متعددة'));
+
+openCamBtn.addEventListener('click', async () => {
+  try {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+    camVideo.srcObject = mediaStream; camModal.style.display = 'flex';
+  } catch(err) { alert('تعذر الوصول إلى الكاميرا.'); }
+});
+
+takePicBtn.addEventListener('click', () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = camVideo.videoWidth || 1280; canvas.height = camVideo.videoHeight || 720;
+  canvas.getContext('2d').drawImage(camVideo, 0, 0, canvas.width, canvas.height);
+  canvas.toBlob(blob => {
+    const camFile = new File([blob], `Camera_ID_${Date.now()}.jpg`, { type: 'image/jpeg' });
+    stopCameraStream(); camModal.style.display = 'none';
+    handleSelectedFiles([camFile], 'التقاط كاميرا');
+  }, 'image/jpeg', 1.0);
+});
+
+closeCamBtn.addEventListener('click', () => { stopCameraStream(); camModal.style.display = 'none'; });
+
+function stopCameraStream(){
+  if(mediaStream){ mediaStream.getTracks().forEach(track => track.stop()); mediaStream = null; }
+}
+
+function handleSelectedFiles(files, sourceType){
+  selectedFiles = files.filter(f => {
+    const name = f.name.toLowerCase();
+    return f.type.startsWith('image/') || name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp');
+  });
+  if(selectedFiles.length > 0){
+    folderStatus.textContent = `📁 تم اختيار (${selectedFiles.length}) صورة عبر (${sourceType}) للمعالجة.`;
+    processedData = []; failedFiles = []; tableBody.innerHTML = '';
+    document.getElementById('failedBody').innerHTML = ''; document.getElementById('failedCard').style.display = 'none';
+    resultsCard.style.display = 'none'; isCancelled = false;
+    stopBtn.style.display = 'block'; stopBtn.textContent = '🛑 إيقاف وحفظ';
+    startProcessing();
+  } else { folderStatus.textContent = '⚠️️ لم يتم العثور على صور صالحة.'; }
+}
+
+stopBtn.addEventListener('click', () => { isCancelled = true; stopBtn.disabled = true; stopBtn.textContent = 'جاري الإيقاف...'; });
+
+function addRowToTable(row, index){
+  resultsCard.style.display = 'block';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td style="text-align:center;">${index}</td>
+    <td>${row.nameAr}</td>
+    <td style="direction:ltr; text-align:left;">${row.nameEn}</td>
+    <td style="direction:ltr;">${row.idNumber}</td>
+    <td style="direction:ltr;">${row.dob}</td>
+    <td style="direction:ltr;">${row.expiry}</td>
+    <td>${row.nationality}</td>
+    <td>${row.profession}</td>
+    <td>${row.empName}</td>
+    <td style="direction:ltr;">${row.empId}</td>
+    <td style="color:${row.notes ? '#FFCC80' : 'inherit'}; font-weight:${row.notes ? 'bold' : 'normal'}">${row.notes || '-'}</td>
+  `;
+  tableBody.appendChild(tr); countSpan.textContent = processedData.length;
+}
+
+function addFailedRowToTable(fileName, reason){
+  const failedCard = document.getElementById('failedCard');
+  const failedBody = document.getElementById('failedBody');
+  failedCard.style.display = 'block';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td style="direction:ltr; text-align:left;">${fileName}</td><td>${reason}</td>`;
+  failedBody.appendChild(tr); document.getElementById('failedCountSpan').textContent = failedFiles.length;
+}
+
+function normalizeDigits(str){
+  const easternArabic = '٠١٢٣٤٥٦٧٨٩'; const persian = '۰۱۲۳۴۵۶۷۸۹';
+  return str.replace(/[٠-٩۰-۹]/g, ch => {
+    let idx = easternArabic.indexOf(ch); if(idx === -1) idx = persian.indexOf(ch);
+    return idx !== -1 ? idx : ch;
+  });
+}
+
+const exactNationalities = ['مصر', 'اليمن', 'بنجلاديش', 'باكستان', 'الهند', 'الصومال', 'سوريا', 'لبنان', 'الاردن', 'الأردن', 'فلسطين', 'بورما'];
+function matchStrictNationality(text){
+  for(let nat of exactNationalities){ if(text.includes(nat)) return nat; } return '';
+}
+
+function parseAndFixDate(str){
+  if(!str) return '';
+  let m = str.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
+  if(m) return `${m[1]}/${m[2].padStart(2, '0')}/${m[3].padStart(2, '0')}`;
+  m = str.match(/(\d{1,2})[\/\-.](\d{1,2})[\/\-.](\d{2,4})/);
+  if(m){
+    let y = m[3]; if(y.length === 2) y = (parseInt(y, 10) > 50 ? '19' : '20') + y;
+    return `${y}/${m[2].padStart(2, '0')}/${m[1].padStart(2, '0')}`;
+  }
+  return '';
+}
+
+function checkExpiry(dateStr) {
+  if (!dateStr || dateStr === 'غير متوفر') return false;
+  let parts = dateStr.split('/');
+  if (parts.length !== 3) return false;
+  let year = parseInt(parts[0], 10), month = parseInt(parts[1], 10), day = parseInt(parts[2], 10);
+  
+  if (year >= 1900) {
+    let expDate = new Date(year, month - 1, day), today = new Date(); today.setHours(0,0,0,0);
+    return expDate < today;
+  } else {
+    try {
+        let formatter = new Intl.DateTimeFormat('en-US-u-ca-islamic-umalqura', { year: 'numeric', month: '2-digit', day: '2-digit' });
+        let partsArr = formatter.formatToParts(new Date());
+        let hy = partsArr.find(p => p.type === 'year').value.replace(/\D/g, ''); 
+        let hm = partsArr.find(p => p.type === 'month').value;
+        let hd = partsArr.find(p => p.type === 'day').value;
+        let currentHijriStr = `${hy}/${hm.padStart(2, '0')}/${hd.padStart(2, '0')}`;
+        let formattedExp = `${year}/${String(month).padStart(2, '0')}/${String(day).padStart(2, '0')}`;
+        return formattedExp < currentHijriStr;
+    } catch(e) { return false; }
+  }
+}
+
+function extractFields(text){
+  const lines = text.split('\n').map(l=>l.trim()).filter(Boolean);
+  
+  const idMatch = text.match(/\b2\d{9}\b/);
+  let idNumber = idMatch ? idMatch[0] : '';
+  if (idNumber && idNumber.startsWith('29')) idNumber = '26' + idNumber.substring(2);
+
+  const empIdMatch = text.match(/\b[17]\d{9}\b/);
+  const empId = empIdMatch ? empIdMatch[0] : '';
+  
+  const allDatesMatch = [...text.matchAll(/(\d{4}[\/\-.]\d{1,2}[\/\-.]\d{1,2}|\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/g)].map(m => parseAndFixDate(m[0]));
+  const uniqueDates = [...new Set(allDatesMatch)].filter(Boolean).sort();
+  let dob = uniqueDates.length > 0 ? uniqueDates[0] : 'غير متوفر';
+  let expiry = uniqueDates.length > 1 ? uniqueDates[uniqueDates.length - 1] : (uniqueDates.length === 1 ? uniqueDates[0] : 'غير متوفر');
+
+  for(let i=0; i<lines.length; i++){
+    let l = lines[i];
+    if(l.includes('الميلاد') || l.includes('تاريخ الميلاد')){
+      let m = l.match(/(\d{4}[\/\-.]\d{1,2}[\/\-.]\d{1,2}|\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/);
+      if(m) dob = parseAndFixDate(m[0]); else if(i+1 < lines.length) dob = parseAndFixDate(lines[i+1]) || dob;
+    }
+    if(l.includes('انتهاء') || l.includes('الانتهاء')){
+      let m = l.match(/(\d{4}[\/\-.]\d{1,2}[\/\-.]\d{1,2}|\d{1,2}[\/\-.]\d{1,2}[\/\-.]\d{2,4})/);
+      if(m) expiry = parseAndFixDate(m[0]); else if(i+1 < lines.length) expiry = parseAndFixDate(lines[i+1]) || expiry;
+    }
+  }
+
+  let nameAr = 'غير متوفر', nameEn = 'غير متوفر';
+  const ignoreWords = ['المملكة', 'العربية', 'السعودية', 'وزارة', 'الداخلية', 'هوية', 'مقيم', 'رقم', 'النسخة', 'الاقامة', 'الإقامة', 'الجنسية', 'الميلاد', 'الانتهاء', 'المهنة', 'صاحب', 'العمل', 'الشروط', 'الاحكام', 'المنشأة', 'مكان', 'الإسلام', 'الديانة'];
+  for(let l of lines){
+    if(nameAr === 'غير متوفر' && /^[\u0600-\u06FF\s]{6,50}$/.test(l) && !/\d/.test(l)){
+      let words = l.split(/\s+/); if(words.length >= 3 && !ignoreWords.some(w => l.includes(w))) nameAr = l;
+    }
+    if(nameEn === 'غير متوفر' && /^[A-Z\s]{6,60}$/.test(l) && !l.includes('SAUDI') && !l.includes('MINISTRY') && !l.includes('PASSPORT')){
+      let words = l.split(/\s+/); if(words.length >= 3) nameEn = l;
+    }
+  }
+
+  let nationality = 'غير متوفر';
+  for(let i=0; i<lines.length; i++){
+    let l = lines[i];
+    if(l.includes('الجنسية') || l.includes('الجنسيه') || l.includes('مكان الميلاد') || l.includes('الميلاد')){
+      let found = matchStrictNationality(l) || (i+1 < lines.length ? matchStrictNationality(lines[i+1]) : '');
+      if(found){ nationality = found; break; }
+    }
+  }
+  if(nationality === 'غير متوفر') nationality = matchStrictNationality(text) || nationality;
+
+  let profession = 'غير متوفر';
+  const invalidProfWords = ['هوية مقيم', 'رقم النسخة', 'المملكة', 'وزارة الداخلية', 'الديانة', 'الإسلام', 'صاحب العمل', 'مكان الإصدار', 'الرياض', 'جدة', 'الدمام'];
+  for(let i=0; i<lines.length; i++){
+    let l = lines[i];
+    if(l.includes('المهنة') || l.includes('المهنه') || l.includes('الوظيفة')){
+      let parts = l.split(':'); let val = parts.length > 1 ? parts[1].trim() : '';
+      if(!val && i+1 < lines.length) val = lines[i+1].trim(); else if(!val) val = l.replace(/المهنة|المهنه|الوظيفة/g, '').replace(/[:\-]/g, '').trim();
+      for(let nat of exactNationalities) val = val.replace(nat, '').trim();
+      val = val.replace(/[\/\-\.\(\)]/g, '').trim();
+      if(val.length > 1 && !invalidProfWords.some(w => val.includes(w)) && !/^\d+$/.test(val)){ profession = val; break; }
+    }
+  }
+  if(profession === 'غير متوفر'){
+    const commonProfessions = ['عامل', 'فني', 'مهندس', 'مراقب', 'سائق', 'محاسب', 'مساعد', 'طباخ', 'نجار', 'حداد', 'حارس', 'مدير', 'مندوب', 'مستشار', 'بناء', 'تحميل', 'تنقيل', 'منسق حركة رافعات', 'إنشاءات', 'انشاعات'];
+    for(let l of lines){
+      for(let prof of commonProfessions){
+        if(l.includes(prof) && !l.includes('صاحب العمل') && !l.includes('الجنسية')){
+          let clean = l.replace(/.*[:\-]/, '').trim();
+          if(clean.length > 1 && !invalidProfWords.some(w => clean.includes(w))){ profession = clean; break; }
+        }
+      }
+      if(profession !== 'غير متوفر') break;
+    }
+  }
+
+  let empName = 'غير متوفر';
+  const ignoreEmpPhrases = ['يجب التحقق', 'من الرمز', 'السريع', 'قبل اعتماد', 'التعامل مع الهوية', 'وزارة الداخلية', 'هوية مقيم', 'رقم النسخة'];
+  for(let i=0; i<lines.length; i++){
+    let l = lines[i];
+    if(l.includes('صاحب العمل') || l.includes('المنشأة')){
+      let parts = l.split(':'); let val = parts.length > 1 ? parts[1].trim() : '';
+      if(!val && i+1 < lines.length) val = lines[i+1].trim();
+      for(let ph of ignoreEmpPhrases) if(val.includes(ph)) val = val.substring(0, val.indexOf(ph)).trim();
+      if(val && !/^\d+$/.test(val) && val.length > 3) empName = val.replace(/[:\-]+/g, '').trim();
+    }
+  }
+  if(empName === 'غير متوفر'){
+    for(let l of lines){
+      if((l.includes('شركة') || l.includes('مؤسسة') || l.includes('مكتب')) && !l.includes('هوية') && !l.includes('رقم')){
+        let clean = l.replace(/.*[:\-]/, '').trim();
+        for(let ph of ignoreEmpPhrases) if(clean.includes(ph)) clean = clean.substring(0, clean.indexOf(ph)).trim();
+        if(clean.length > 3){ empName = clean; break; }
+      }
+    }
+  }
+
+  let notesArr = [];
+  if (checkExpiry(expiry)) notesArr.push("الهوية منتهية");
+  if (empId && empId.startsWith('1')) notesArr.push("ليس لديه تصريح بالعمل");
+
+  return { 
+    nameAr, nameEn, idNumber: idNumber || 'غير_متوفر', dob, expiry, nationality, profession, empName, empId: empId || 'غير_متوفر', notes: notesArr.join(' - ')
+  };
+}
+
+function processFullQuality(file){
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file);
+    const img = new Image();
+    const timeoutId = setTimeout(() => { URL.revokeObjectURL(objectUrl); reject(new Error('ملف تالف أو كبير جدًا')); }, 15000);
+    img.onload = () => {
+      clearTimeout(timeoutId);
+      try {
+        const maxDim = 2000, scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.round(img.naturalWidth * scale); canvas.height = Math.round(img.naturalHeight * scale);
+        canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+        URL.revokeObjectURL(objectUrl); resolve(dataUrl);
+      } catch(e){ URL.revokeObjectURL(objectUrl); reject(e); }
+    };
+    img.onerror = () => { clearTimeout(timeoutId); URL.revokeObjectURL(objectUrl); reject(new Error('ملف غير مدعوم')); };
+    img.src = objectUrl;
+  });
+}
+
+async function callOcrWithKey(base64Img, keyEntry){
+  const body = new URLSearchParams();
+  body.append('apikey', keyEntry.key); body.append('base64Image', base64Img); body.append('language', 'ara');
+  body.append('isOverlayRequired', 'false'); body.append('detectOrientation', 'true'); body.append('scale', 'true'); body.append('OCREngine', '3');
+
+  const resp = await fetch('https://api.ocr.space/parse/image', { method: 'POST', body: body });
+  const rawText = await resp.text();
+
+  if(resp.status === 429){
+    let retryAfter = 3660; try{ retryAfter = JSON.parse(rawText).retryAfter || retryAfter; }catch(e){}
+    keyEntry.cooldownUntil = Date.now() + (retryAfter * 1000) + 2000;
+    const err = new Error('تجاوز المفتاح حد الاستخدام'); err.isRateLimit = true; throw err;
+  }
+  if(!resp.ok) throw new Error(`HTTP ${resp.status}`);
+  
+  let json; try{ json = JSON.parse(rawText); }catch(parseErr){ throw new Error('الرد مش JSON صالح'); }
+  if(json.IsErroredOnProcessing || !json.ParsedResults){
+    const reason = json.ErrorMessage ? (Array.isArray(json.ErrorMessage) ? json.ErrorMessage.join(' ') : json.ErrorMessage) : 'مرفوضة';
+    throw new Error(reason);
+  }
+  return json;
+}
+
+async function processOneFile(file, attemptsLeft){
+  const base64Img = await processFullQuality(file);
+  let lastErr = null;
+  while(attemptsLeft > 0){
+    const keyEntry = pickAvailableKey(); const waitMs = keyEntry.cooldownUntil - Date.now();
+    if(waitMs > 0){
+      progLabel.textContent = `⏳ انتظار ${Math.ceil(waitMs/60000)} دقيقة (الملف: ${file.name})`;
+      await new Promise(r => setTimeout(r, Math.min(waitMs, 65000))); continue;
+    }
+    try{
+      const json = await callOcrWithKey(base64Img, keyEntry);
+      return { json, base64Img };
+    }catch(err){
+      lastErr = err; if(err.isRateLimit){ attemptsLeft--; continue; } throw err;
+    }
+  }
+  throw lastErr || new Error('استنفاد المفاتيح');
+}
+
+async function startProcessing(){
+  keyPool = parseKeys().map(k => ({ key: k, cooldownUntil: 0 }));
+  if(keyPool.length === 0){ alert('برجاء إدخال مفتاح OCR.space'); return; }
+  keyRotationIndex = 0; progWrap.style.display = 'block';
+
+  for(let i = 0; i < selectedFiles.length; i++){
+    if(isCancelled){ progLabel.textContent = `⏹ تم الإيقاف.`; stopBtn.style.display = 'none'; return; }
+
+    const file = selectedFiles[i];
+    const progress = Math.round(((i) / selectedFiles.length) * 100);
+    progFill.style.width = progress + '%'; progLabel.textContent = `معالجة (${i + 1}/${selectedFiles.length}): ${file.name}`;
+
+    try {
+      const { json, base64Img } = await processOneFile(file, keyPool.length * 3);
+      const text = json.ParsedResults.map(r => r.ParsedText).join('\n');
+      const normText = normalizeDigits(text);
+      const f = extractFields(normText);
+      
+      if(f.idNumber === 'غير_متوفر' || !f.idNumber) throw new Error("لم يتم العثور على رقم هوية صحيح (10 أرقام تبدأ بـ 2)");
+
+      const ext = file.name.substring(file.name.lastIndexOf('.')) || '.jpg';
+      const item = {
+        fileName: file.name, nameAr: f.nameAr, nameEn: f.nameEn, idNumber: f.idNumber, dob: f.dob, expiry: f.expiry,
+        nationality: f.nationality, profession: f.profession, empName: f.empName, empId: f.empId, notes: f.notes,
+        ext: ext, imageBase64: base64Img
+      };
+
+      processedData.push(item);
+      addRowToTable(item, processedData.length);
+      sendToSheet('success', item); // حفظ للشيت + درايف
+    } catch(err) {
+      failedFiles.push({ name: file.name, reason: err.message });
+      addFailedRowToTable(file.name, err.message);
+      sendToSheet('failed', { name: file.name, reason: err.message });
+    }
+
+    if(!isCancelled && i < selectedFiles.length - 1) await new Promise(r => setTimeout(r, 1000));
+  }
+
+  progFill.style.width = '100%';
+  const failNote = failedFiles.length ? ` — فشلت (${failedFiles.length})` : '';
+  progLabel.textContent = `✅ تمت معالجة (${processedData.length}) صورة بنجاح${failNote}`;
+  stopBtn.style.display = 'none';
+}
+
+document.getElementById('downloadExcel').addEventListener('click', () => {
+  if(processedData.length === 0) return;
+  let csvContent = "\uFEFFم,الاسم بالعربي,الاسم بالإنجليزية,رقم الهوية,تاريخ الميلاد,الانتهاء,الجنسية,المهنة,صاحب العمل,هوية صاحب العمل,ملاحظات\n";
+  processedData.forEach((row, idx) => {
+    csvContent += `"${idx + 1}","${row.nameAr}","${row.nameEn}","${row.idNumber}","${row.dob}","${row.expiry}","${row.nationality}","${row.profession}","${row.empName}","${row.empId}","${row.notes}"\n`;
+  });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Residencies_Data.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+
+document.getElementById('downloadBat').addEventListener('click', () => {
+  if(processedData.length === 0) return;
+  let batContent = "@echo off\r\nchcp 65001 > nul\r\necho جاري إعادة التسمية...\r\n\r\n";
+  processedData.forEach(row => { if(row.idNumber && row.idNumber !== 'غير_متوفر') batContent += `ren "${row.fileName}" "${row.idNumber}${row.ext}"\r\r\n`; });
+  batContent += "\r\necho.\r\necho تم!\r\npause\r\n";
+  const blob = new Blob([batContent], { type: 'text/plain;charset=utf-8;'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Rename_Images.bat';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+
+document.getElementById('downloadFailed').addEventListener('click', () => {
+  if(failedFiles.length === 0) return;
+  let csvContent = "\uFEFFم,اسم الملف,سبب الفشل\n";
+  failedFiles.forEach((f, idx) => {
+    csvContent += `"${idx + 1}","${f.name}","${(f.reason || '').replace(/"/g, '""')}"\n`;
+  });
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'Failed_Images.csv';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+});
+</script>
+</body>
+</html>
