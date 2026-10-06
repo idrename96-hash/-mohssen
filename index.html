@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>البحيرات الدولية | الصفحة الرئيسية</title>
+    <title>البحيرات الدولية | تسجيل الدخول</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -14,7 +14,7 @@
             --card-bg: #ffffff;
             --text-dark: #333333;
             --text-gray: #666666;
-            --border-color: #e1e4e8;
+            --error-color: #ff4d4d;
         }
 
         body {
@@ -26,6 +26,81 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+        }
+
+        /* شاشة تسجيل الدخول */
+        #login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+        }
+
+        .login-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            font-size: 26px;
+            margin-bottom: 5px;
+        }
+
+        .login-card h2 {
+            color: var(--text-gray);
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(to left, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-card button:hover {
+            background: linear-gradient(to left, var(--accent), #1de9b6);
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* المحتوى الرئيسي (مخفي حتى يتم تسجيل الدخول) */
+        #main-content {
+            display: none;
+            flex-direction: column;
+            flex: 1;
         }
 
         .container {
@@ -132,53 +207,95 @@
 </head>
 <body>
 
-    <div class="container">
-        <div class="header">
+    <!-- شاشة تسجيل الدخول -->
+    <div id="login-screen">
+        <div class="login-card">
             <h1>شركة البحيرات الدولية</h1>
-            <p>شركة البحيرات الدولية للمقاولات والإنشاءات</p>
-        </div>
-
-        <div class="services-grid">
-            <!-- نظام الرواتب -->
-            <a href="payroll.html" class="card">
-                <div class="icon-circle">📊</div>
-                <h3>نظام الرواتب والفئات</h3>
-                <p>إدارة كشوفات الحضور وحساب الرواتب والفئات النقدية</p>
-            </a>
-
-            <!-- قارئ الهوية -->
-            <a href="iqama.html" class="card">
-                <div class="icon-circle">📄</div>
-                <h3>قارئ الهوية الرقمية</h3>
-                <p>نظام استخراج وقراءة بيانات الهوية الرقمية</p>
-            </a>
-
-            <!-- الموردين -->
-            <a href="suppliers.html" class="card">
-                <div class="icon-circle">🤝</div>
-                <h3>الموردين</h3>
-                <p>إدارة حسابات ومتابعة بيانات وتعاملات الموردين</p>
-            </a>
-
-            <!-- النماذج -->
-            <a href="forms.html" class="card">
-                <div class="icon-circle">📁</div>
-                <h3>النماذج</h3>
-                <p>استعراض وتحميل النماذج والمستندات الإدارية</p>
-            </a>
-
-            <!-- بيانات الموظفين -->
-            <a href="employees.html" class="card">
-                <div class="icon-circle">👥</div>
-                <h3>بيانات الموظفين</h3>
-                <p>إدارة ملفات وسجلات بيانات العاملين بالشركة</p>
-            </a>
+            <h2>تسجيل الدخول</h2>
+            <input type="password" id="password-input" placeholder="أدخل كلمة المرور">
+            <button onclick="checkPassword()">دخول</button>
+            <div id="error-message" class="error-msg">كلمة المرور غير صحيحة!</div>
         </div>
     </div>
 
-    <div class="footer">
-        &copy; 2026 [ NEGM ] البحيرات الدولية. جميع الحقوق محفوظة.
+    <!-- الواجهة الرئيسية (تظهر بعد كلمة المرور الصحيحة) -->
+    <div id="main-content">
+        <div class="container">
+            <div class="header">
+                <h1>شركة البحيرات الدولية</h1>
+                <p>شركة البحيرات الدولية للمقاولات والإنشاءات</p>
+            </div>
+
+            <div class="services-grid">
+                <!-- نظام الرواتب -->
+                <a href="payroll.html" class="card">
+                    <div class="icon-circle">📊</div>
+                    <h3>نظام الرواتب والفئات</h3>
+                    <p>إدارة كشوفات الحضور وحساب الرواتب والفئات النقدية</p>
+                </a>
+
+                <!-- قارئ الهوية -->
+                <a href="iqama.html" class="card">
+                    <div class="icon-circle">📄</div>
+                    ### قارئ الهوية الرقمية
+                    <p>نظام استخراج وقراءة بيانات الهوية الرقمية</p>
+                </a>
+
+                <!-- الموردين -->
+                <a href="suppliers.html" class="card">
+                    <div class="icon-circle">🤝</div>
+                    <h3>الموردين</h3>
+                    <p>إدارة حسابات ومتابعة بيانات وتعاملات الموردين</p>
+                </a>
+
+                <!-- النماذج -->
+                <a href="forms.html" class="card">
+                    <div class="icon-circle">📁</div>
+                    <h3>النماذج</h3>
+                    <p>استعراض وتحميل النماذج والمستندات الإدارية</p>
+                </a>
+
+                <!-- بيانات الموظفين -->
+                <a href="employees.html" class="card">
+                    <div class="icon-circle">👥</div>
+                    <h3>بيانات الموظفين</h3>
+                    <p>إدارة ملفات وسجلات بيانات العاملين بالشركة</p>
+                </a>
+            </div>
+        </div>
+
+        <div class="footer">
+            &copy; 2026 [ NEGM ] البحيرات الدولية. جميع الحقوق محفوظة.
+        </div>
     </div>
+
+    <script>
+        // ----------------------------------------------------
+        // مكان الرقم السري: يمكنك تغيير "123" إلى أي كلمة مرور تريدها
+        // ----------------------------------------------------
+        const correctPassword = "123"; 
+
+        function checkPassword() {
+            const inputVal = document.getElementById('password-input').value;
+            const errorMsg = document.getElementById('error-message');
+            
+            if (inputVal === correctPassword) {
+                // إخفاء شاشة تسجيل الدخول وإظهار المحتوى الرئيسي
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'flex';
+            } else {
+                // إظهار رسالة الخطأ
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // السماح بالدخول عبر الضغط على زر Enter من لوحة المفاتيح
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+    </script>
 
 </body>
 </html>
