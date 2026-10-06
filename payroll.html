@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-width=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نظام دمج وحساب الرواتب | البحيرات الدولية</title>
     
     <!-- استدعاء الخط العربي Cairo -->
@@ -227,10 +227,11 @@
             padding-top: 20px;
         }
         .bank-title { color: var(--bank-color); text-align: center; margin-bottom: 20px; font-size: 22px; font-weight:800;}
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
         .summary-box { background: #fffdfa; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #fae5d3; }
-        .summary-box .title { display: block; color: #666; font-size: 15px; font-weight: 600;}
-        .summary-box .count { display: block; font-size: 28px; color: var(--bank-color); margin-top: 5px; font-weight: 800;}
+        .summary-box .title { display: block; color: #666; font-size: 14px; font-weight: 600; margin-bottom: 5px;}
+        .summary-box .count { display: block; font-size: 26px; color: var(--bank-color); font-weight: 800; line-height: 1.1;}
+        .summary-box .sub-val { display: block; font-size: 12px; color: #888; font-weight: 600; margin-top: 4px; }
 
     </style>
 </head>
@@ -297,11 +298,10 @@
     let globalFinalData = [];
     let globalCols = [];
     
-    // فئات العملات
-    const denominations = [500, 200, 100, 50, 20,10, 5, 1];
+    // فئات العملات مرتبة تنازلياً مع فئة الـ 20
+    const denominations = [500, 200, 100, 50, 20, 10, 5, 1];
     let bankTotals = {};
 
-    // تغيير شكل الزر عند اختيار ملف
     function updateFileName(inputId, textId, wrapId) {
         const fileInput = document.getElementById(inputId);
         const textElement = document.getElementById(textId);
@@ -404,12 +404,11 @@
             const standardCols = ['رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
             const dayCols = Array.from({length: 31}, (_, i) => String(i + 1));
             const finalCols = ['ساعات العمل (من 1 إلى 15)', 'ساعات العمل (من 16 إلى 31)', 'إجمالي ساعات الشهر', 'راتب النصف الأول (ريال)', 'راتب النصف الثاني (ريال)', 'إجمالي الراتب المستحق (ريال)'];
-            const currencyCols = denominations.map(d => `فئة ${d}`); // أعمدة الفئات
+            const currencyCols = denominations.map(d => `فئة ${d}`);
 
             globalCols = [...standardCols, ...dayCols, ...finalCols, ...currencyCols];
             globalFinalData = [];
 
-            // تصفير الخزينة
             bankTotals = { sum: 0 };
             denominations.forEach(d => bankTotals[d] = 0);
 
@@ -429,7 +428,7 @@
 
                 let s1 = h1 * (p1 === 'عامل' ? rateWorker : rateOther);
                 let s2 = h2 * (p2 === 'عامل' ? rateWorker : rateOther);
-                let totalSalary = Math.round(s1 + s2); // التقريب لعدد صحيح لحساب الفئات
+                let totalSalary = Math.round(s1 + s2);
 
                 row['راتب النصف الأول (ريال)'] = s1;
                 row['راتب النصف الثاني (ريال)'] = s2;
@@ -437,11 +436,10 @@
                 
                 bankTotals.sum += totalSalary;
 
-                // حساب كم ورقة يحتاج من كل فئة
                 let remaining = totalSalary;
                 denominations.forEach(denom => {
                     let count = Math.floor(remaining / denom);
-                    row[`فئة ${denom}`] = count > 0 ? count : ''; // تركها فارغة إذا كانت 0 لشكل أفضل
+                    row[`فئة ${denom}`] = count > 0 ? count : '';
                     bankTotals[denom] += count;
                     remaining = remaining % denom;
                 });
@@ -449,7 +447,6 @@
                 globalFinalData.push(row);
             });
 
-            // إضافة صف يمثل الإجمالي الكلي للرواتب والبنك في نهاية الجدول
             let totalRow = {};
             globalCols.forEach(col => totalRow[col] = '');
             totalRow['الإســــــــــم'] = 'الإجمالي الكلي (للسحب البنكي)';
@@ -476,11 +473,14 @@
         
         denominations.forEach(denom => {
             const count = bankTotals[denom];
+            const totalValue = count * denom; // حساب القيمة الإجمالية لهذه الفئة بالريال
+            
             const div = document.createElement('div');
             div.className = 'summary-box';
             div.innerHTML = `
                 <span class="title">ورقة فئة ${denom}</span>
-                <span class="count">${count}</span>
+                <span class="count">${count.toLocaleString()}</span>
+                <span class="sub-val">${totalValue.toLocaleString()} ريال</span>
             `;
             grid.appendChild(div);
         });
@@ -500,7 +500,6 @@
             thead.appendChild(th);
         });
 
-        // عرض أول 100 موظف في المتصفح فقط لسرعة الأداء + إظهار صف الإجمالي الكلي
         const displayData = globalFinalData.slice(0, 100);
         if (globalFinalData.length > 100) {
             displayData.push(globalFinalData[globalFinalData.length - 1]);
@@ -516,7 +515,6 @@
                 const td = document.createElement('td');
                 td.textContent = row[col];
                 
-                // تمييز الألوان للأعمدة
                 if (!isTotalRow) {
                     if (col === 'إجمالي الراتب المستحق (ريال)') td.className = 'highlight-col';
                     if (String(col).startsWith('فئة')) td.className = 'currency-col';
@@ -553,9 +551,8 @@
                 
                 const colName = globalCols[colNumber - 1];
 
-                // تلوين الخلايا في الإكسيل
                 if (isTotalRow) {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2A5298' } }; // أزرق للإجمالي
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF2A5298' } };
                     cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
                 } else {
                     if (colName === 'إجمالي الراتب المستحق (ريال)') {
