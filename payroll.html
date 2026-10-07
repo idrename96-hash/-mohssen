@@ -24,7 +24,7 @@
             --text-dark: #333333;
             --text-gray: #666666;
             --border-color: #e1e4e8;
-            --bank-color: #f39c12; /* لون خاص لقسم البنك */
+            --bank-color: #f39c12;
         }
 
         body {
@@ -148,6 +148,7 @@
             width: 100%;
             transition: 0.3s;
             box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+            margin-top: 10px;
         }
 
         .btn:hover {
@@ -158,12 +159,17 @@
         .btn-success {
             background: linear-gradient(to left, var(--accent), #1de9b6);
             box-shadow: 0 4px 15px rgba(0, 176, 155, 0.2);
-            margin-top: 20px;
-            display: none;
         }
-        
-        .btn-success:hover {
-            box-shadow: 0 6px 20px rgba(0, 176, 155, 0.4);
+
+        .btn-print {
+            background: linear-gradient(to left, #e67e22, #f39c12);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.2);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
         }
 
         .status {
@@ -177,7 +183,6 @@
         .status.success { color: var(--accent); }
         .status.loading { color: var(--primary-light); }
 
-        /* تنسيقات الجدول الأساسية */
         .table-responsive {
             overflow-x: auto;
             max-height: 500px;
@@ -214,7 +219,6 @@
         tbody tr:nth-child(even) { background-color: #fcfcfc; }
         tbody tr:hover { background-color: #f1f6ff; }
         
-        /* تنسيقات الأعمدة الخاصة والبنك */
         .highlight-col { background-color: #e6f7f5; font-weight: 600; color: var(--accent-hover); }
         .currency-col { background-color: #fff8e1; color: #d35400; font-weight: 700; }
         .total-row { background-color: var(--primary-light) !important; color: white !important; font-weight: bold; font-size: 15px; }
@@ -233,6 +237,56 @@
         .summary-box .count { display: block; font-size: 26px; color: var(--bank-color); font-weight: 800; line-height: 1.1;}
         .summary-box .sub-val { display: block; font-size: 12px; color: #888; font-weight: 600; margin-top: 4px; }
 
+        /* ==========================================
+           تنسيقات طباعة الظرف المضغوطة والمتوسطة
+           ========================================== */
+        #envelopesPrintArea { display: none; }
+
+        @media print {
+            @page {
+                size: 22cm 11cm;
+                margin: 0;
+            }
+            body * { visibility: hidden; }
+            #envelopesPrintArea, #envelopesPrintArea * { visibility: visible; }
+            #envelopesPrintArea {
+                display: block !important;
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 22cm;
+                height: 11cm;
+                direction: rtl;
+                background: white;
+            }
+            .envelope-row-card {
+                width: 22cm;
+                height: 11cm;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                page-break-after: always;
+                box-sizing: border-box;
+                padding: 0.4cm;
+            }
+            .env-horizontal-table {
+                width: 100%;
+                border-collapse: collapse;
+                border: 1.5px solid #000;
+            }
+            .env-horizontal-table th, .env-horizontal-table td {
+                border: 1px solid #000;
+                padding: 5px 3px;
+                text-align: center;
+                font-size: 11px;
+                font-weight: 700;
+                color: #000;
+            }
+            .env-horizontal-table th {
+                background-color: #eaeaea;
+                font-size: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -283,7 +337,7 @@
             <div class="summary-grid" id="summaryGrid"></div>
         </div>
 
-        <!-- معاينة الجدول -->
+        <!-- معاينة الجدول وأزرار التحميل والطباعة -->
         <div class="table-responsive" id="tableWrapper">
             <table id="previewTable">
                 <thead><tr id="tableHead"></tr></thead>
@@ -291,14 +345,19 @@
             </table>
         </div>
 
-        <button id="downloadBtn" class="btn btn-success" onclick="downloadExcel()">📥 تحميل كشف الرواتب النهائي (Excel)</button>
+        <div class="action-buttons">
+            <button id="downloadBtn" class="btn btn-success" style="display: none;" onclick="downloadExcel()">📥 تحميل كشف الرواتب النهائي (Excel)</button>
+            <button id="printEnvelopesBtn" class="btn btn-print" style="display: none;" onclick="printEnvelopes()">🖨️ طباعة الظروف (بتسلسل جديد)</button>
+        </div>
     </div>
+
+    <!-- منطقة طباعة الظروف -->
+    <div id="envelopesPrintArea"></div>
 
 <script>
     let globalFinalData = [];
     let globalCols = [];
     
-    // فئات العملات مرتبة تنازلياً مع فئة الـ 20
     const denominations = [500, 200, 100, 50, 20, 10, 5, 1];
     let bankTotals = {};
 
@@ -352,6 +411,7 @@
         showStatus("⏳ جاري تحليل، دمج وحساب الفئات... يرجى الانتظار", "loading");
         document.getElementById('tableWrapper').style.display = 'none';
         document.getElementById('downloadBtn').style.display = 'none';
+        document.getElementById('printEnvelopesBtn').style.display = 'none';
         document.getElementById('bankSummary').style.display = 'none';
 
         try {
@@ -401,7 +461,7 @@
             processHalf(dataHalf1, true);
             processHalf(dataHalf2, false);
 
-            const standardCols = ['رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
+            const standardCols = ['م', 'رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
             const dayCols = Array.from({length: 31}, (_, i) => String(i + 1));
             const finalCols = ['ساعات العمل (من 1 إلى 15)', 'ساعات العمل (من 16 إلى 31)', 'إجمالي ساعات الشهر', 'راتب النصف الأول (ريال)', 'راتب النصف الثاني (ريال)', 'إجمالي الراتب المستحق (ريال)'];
             const currencyCols = denominations.map(d => `فئة ${d}`);
@@ -412,9 +472,16 @@
             bankTotals = { sum: 0 };
             denominations.forEach(d => bankTotals[d] = 0);
 
-            Object.values(employees).forEach(emp => {
+            // توليد تسلسل جديد تلقائي ومتتابع (1, 2, 3...) للملف المدمج
+            let serialCounter = 1;
+
+            Object.values(employees).forEach((emp) => {
                 let row = {};
-                standardCols.forEach(col => row[col] = emp[col] || '');
+                row['م'] = serialCounter++; // تسلسل جديد وتلقائي
+
+                standardCols.forEach(col => {
+                    if (col !== 'م') row[col] = emp[col] || '';
+                });
                 dayCols.forEach(col => row[col] = emp[col] !== undefined ? emp[col] : '');
 
                 let h1 = parseFloat(emp['ساعات العمل (من 1 إلى 15)']) || 0;
@@ -458,7 +525,8 @@
 
             renderBankSummary();
             renderTablePreview();
-            showStatus("✅ تمت المعالجة بنجاح! يمكنك مراجعة الجدول وتحميله.", "success");
+            prepareEnvelopesHTML(); 
+            showStatus("✅ تمت المعالجة بنجاح! تم إنشاء تسلسل جديد ومتتابع للملف المدمج والظروف.", "success");
 
         } catch (error) {
             console.error(error);
@@ -473,7 +541,7 @@
         
         denominations.forEach(denom => {
             const count = bankTotals[denom];
-            const totalValue = count * denom; // حساب القيمة الإجمالية لهذه الفئة بالريال
+            const totalValue = count * denom;
             
             const div = document.createElement('div');
             div.className = 'summary-box';
@@ -526,6 +594,54 @@
 
         document.getElementById('tableWrapper').style.display = 'block';
         document.getElementById('downloadBtn').style.display = 'block';
+        document.getElementById('printEnvelopesBtn').style.display = 'block';
+    }
+
+    function prepareEnvelopesHTML() {
+        const container = document.getElementById('envelopesPrintArea');
+        container.innerHTML = '';
+
+        const employees = globalFinalData.slice(0, -1);
+
+        employees.forEach((emp) => {
+            let sNo = emp['م'] || '-';
+            let name = emp['الإســــــــــم'] || '-';
+            let idNum = emp['رقم الهويه'] || '-';
+            let nationality = emp['الجنسيه'] || '-';
+            let profession = emp['المهنة (من 16 إلى 31)'] || emp['المهنة (من 1 إلى 15)'] || '-';
+            let totalHours = emp['إجمالي ساعات الشهر'] || 0;
+            let totalSalary = emp['إجمالي الراتب المستحق (ريال)'] || 0;
+
+            let card = document.createElement('div');
+            card.className = 'envelope-row-card';
+            card.innerHTML = `
+                <table class="env-horizontal-table">
+                    <tr>
+                        <th>م</th>
+                        <th>الاسم</th>
+                        <th>رقم الإقامة</th>
+                        <th>الجنسية</th>
+                        <th>المهنة</th>
+                        <th>عدد الساعات</th>
+                        <th>المبلغ</th>
+                    </tr>
+                    <tr>
+                        <td>${sNo}</td>
+                        <td>${name}</td>
+                        <td>${idNum}</td>
+                        <td>${nationality}</td>
+                        <td>${profession}</td>
+                        <td>${totalHours}</td>
+                        <td>${totalSalary.toLocaleString()} ريال</td>
+                    </tr>
+                </table>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    function printEnvelopes() {
+        window.print();
     }
 
     async function downloadExcel() {
