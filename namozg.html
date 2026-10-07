@@ -6,9 +6,12 @@
     <title>نماذج المقابلات والتصاريح | البحيرات الدولية</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
     
+    <!-- مكتبات الإكسيل والـ PDF والتحويل لصور -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root {
@@ -70,12 +73,12 @@
             pointer-events: none;
         }
 
-        /* تكبير وتخصيص خط اسم المشروع ليكون بارزاً */
+        /* تنسيق وتخصيص خط اسم المشروع */
         .overlay-project {
             font-size: 16px !important;
             font-family: 'Arial', 'Cairo', sans-serif;
             font-weight: bold;
-            color: #000; !important;
+            color: #000 !important;
         }
     </style>
 </head>
@@ -108,7 +111,7 @@
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 طباعة النماذج أو حفظها (Ctrl+P)[cite: 6]</button>
+            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد</button>
         </div>
     </div>
 
@@ -175,13 +178,13 @@
                 });
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
-            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف[cite: 6]."); }
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
         }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}[cite: 6]`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
@@ -194,12 +197,12 @@
         }
 
         function generateAllForms() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('interview');
         }
 
         function generatePermits() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('permit');
         }
 
@@ -306,7 +309,7 @@
 
                     viewContainer.innerHTML += `
                         <div class="permit-wrapper">
-                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج[cite: 6]">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
                             ${overlayHtml}
                         </div>
                     `;
@@ -314,12 +317,56 @@
                 generatedCount++;
             }
 
-            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
             document.getElementById('previewContainer').style.display = 'block';
-            document.getElementById('downloadWordBtn').style.display = 'block';
+            document.getElementById('downloadPdfBtn').style.display = 'block';
         }
 
-        function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة[cite: 6]."); }
+        // ==========================================
+        // دالة التحميل المباشر لجميع النماذج كملف PDF واحد شامل
+        // ==========================================
+        async function downloadAllAsPDF() {
+            const { jsPDF } = window.jspdf;
+            const sheets = document.querySelectorAll('.permit-wrapper, .interview-sheet');
+            
+            if (sheets.length === 0) {
+                alert("لا توجد نماذج مولدة للتحميل!");
+                return;
+            }
+
+            const btn = document.getElementById('downloadPdfBtn');
+            btn.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
+            btn.disabled = true;
+
+            try {
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                for (let i = 0; i < sheets.length; i++) {
+                    let sheet = sheets[i];
+                    let canvas = await html2canvas(sheet, { scale: 2, useCORS: true });
+                    let imgData = canvas.toDataURL('image/jpeg', 1.0);
+                    
+                    let imgWidth = 210; // عرض A4 بالمليمتر
+                    let pageHeight = 295; // ارتفاع A4 بالمليمتر
+                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    
+                    if (i > 0) {
+                        pdf.addPage();
+                    }
+                    
+                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
+                }
+
+                pdf.save('تصاريح_الدخول_الشاملة.pdf');
+                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
+                btn.disabled = false;
+            } catch (error) {
+                console.error(error);
+                alert("حدث خطأ أثناء تصدير ملف الـ PDF.");
+                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
+                btn.disabled = false;
+            }
+        }
     </script>
 </body>
 </html>
