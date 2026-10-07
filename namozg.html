@@ -46,7 +46,7 @@
         .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
         .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        /* حاوية التصريح الثابتة */
+        /* حاوية التصريح */
         .permit-wrapper {
             position: relative;
             width: 100%;
@@ -63,7 +63,7 @@
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             color: #000;
             white-space: nowrap;
             z-index: 10;
@@ -81,45 +81,44 @@
 
         <div class="form-group">
             <div class="label-container">
-                <label>الخطوة 1: حمل قالب الإكسيل المنظم:</label>
-                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول</button>
+                <label>الخطوة 1: حمل قالب الإكسيل المنظم[cite: 6]:</label>
+                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول[cite: 6]</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
+            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات[cite: 6]:</label>
             <div class="file-upload-wrapper">
-                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
+                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)[cite: 6]</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
             </div>
         </div>
 
-        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية</button>
-        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
+        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية[cite: 6]</button>
+        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول[cite: 6]</button>
 
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 طباعة النماذج أو حفظها (Ctrl+P)</button>
+            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 طباعة النماذج أو حفظها (Ctrl+P)[cite: 6]</button>
         </div>
     </div>
 
     <script>
         let loadedEmployees = [];
-        // رابط مباشر للصورة من نفس مجلد المشروع على جيت هب
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // إحداثياتك الدقيقة المعتمدة
+        // الإحداثيات المصححة بدقة لتدخل الكلمات في منتصف الصناديق الصفراء تماماً
         let basePositions = {
-            'f-name': { top: 23.23, right: 38.07 },
-            'f-nat': { top: 26.82, right: 40.18 },
-            'f-id': { top: 30.49, right: 36.98 },
-            'f-exp': { top: 34.26, right: 55.72 },
-            'f-job1': { top: 38.03, right: 34.86 },
-            'f-job2': { top: 37.87, right: 56.75 },
-            'f-comp': { top: 45.39, right: 35.43 },
-            'f-spon': { top: 52.54, right: 48.04 },
-            'f-phone': { top: 59.29, right: 39.54 }
+            'f-name': { top: 23.10, right: 35.00 },
+            'f-nat': { top: 26.65, right: 48.00 },
+            'f-id': { top: 30.30, right: 54.50 },
+            'f-exp': { top: 34.00, right: 78.50 },
+            'f-job1': { top: 37.75, right: 55.00 },
+            'f-job2': { top: 37.75, right: 29.50 },
+            'f-comp': { top: 45.20, right: 46.50 },
+            'f-spon': { top: 52.40, right: 46.50 },
+            'f-phone': { top: 59.10, right: 50.00 }
         };
 
         const jobCriteria = {
@@ -167,13 +166,13 @@
                 });
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
-            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف[cite: 6]."); }
         }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}[cite: 6]`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
@@ -186,12 +185,12 @@
         }
 
         function generateAllForms() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
             renderForms('interview');
         }
 
         function generatePermits() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
             renderForms('permit');
         }
 
@@ -295,7 +294,7 @@
 
                     viewContainer.innerHTML += `
                         <div class="permit-wrapper">
-                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج[cite: 6]">
                             ${overlayHtml}
                         </div>
                     `;
@@ -303,12 +302,12 @@
                 generatedCount++;
             }
 
-            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
             document.getElementById('previewContainer').style.display = 'block';
             document.getElementById('downloadWordBtn').style.display = 'block';
         }
 
-        function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة."); }
+        function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة[cite: 6]."); }
     </script>
 </body>
 </html>
