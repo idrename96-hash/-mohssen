@@ -130,15 +130,15 @@
 
         <div class="form-group">
             <div class="label-container">
-                <label>الخطوة 1: حمل قالب الإكسيل المنظم[cite: 6]:</label>
-                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول[cite: 6]</button>
+                <label>الخطوة 1: حمل قالب الإكسيل المنظم:</label>
+                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات[cite: 6]:</label>
+            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
             <div class="file-upload-wrapper">
-                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)[cite: 6]</span>
+                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
             </div>
         </div>
@@ -154,17 +154,14 @@
             </div>
         </div>
 
-        <!-- أزرار التوليد (التصاريح أولاً ثم المقابلات) -->
-        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول[cite: 6]</button>
-        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية[cite: 6]</button>
-
-        <!-- نسخة إضافية من زر التحميل بالأعلى لسهولة الوصول -->
-        <button id="downloadPdfBtnTop" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]</button>
+        <!-- تبديل الأماكن: تصاريح الدخول أولاً ثم المقابلات الشخصية -->
+        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
+        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية</button>
 
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]</button>
+            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد</button>
         </div>
     </div>
 
@@ -183,10 +180,10 @@
             'f-spon': { top: 52.54, right: 39.72 },
             'f-phone': { top: 59.29, right: 39.54 },
             'f-project': { top: 11.00, right: 28.00 },
-            'f-new': { top: 4.65, right: 13.9 },       
-            'f-lost': { top: 4.65, right: 24.8 },      
-            'f-damaged': { top: 4.65, right: 35.6 },   
-            'f-renew': { top: 4.65, right: 46.5 }      
+            'f-new': { top: 4.85, right: 18.2 },       
+            'f-lost': { top: 4.85, right: 29.2 },      
+            'f-damaged': { top: 4.85, right: 40.2 },   
+            'f-renew': { top: 4.85, right: 51.2 }      
         };
 
         const jobCriteria = {
@@ -234,13 +231,13 @@
                 });
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
-            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف[cite: 6]."); }
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
         }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}[cite: 6]`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
@@ -253,12 +250,12 @@
         }
 
         function generateAllForms() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('interview');
         }
 
         function generatePermits() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('permit');
         }
 
@@ -377,7 +374,7 @@
 
                     viewContainer.innerHTML += `
                         <div class="permit-wrapper">
-                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج[cite: 6]">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
                             ${overlayHtml}
                         </div>
                     `;
@@ -385,10 +382,9 @@
                 generatedCount++;
             }
 
-            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
             document.getElementById('previewContainer').style.display = 'block';
             document.getElementById('downloadPdfBtn').style.display = 'block';
-            document.getElementById('downloadPdfBtnTop').style.display = 'block';
         }
 
         async function downloadAllAsPDF() {
@@ -400,11 +396,7 @@
                 return;
             }
 
-            const btnTop = document.getElementById('downloadPdfBtnTop');
             const btnBottom = document.getElementById('downloadPdfBtn');
-            
-            btnTop.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
-            btnTop.disabled = true;
             btnBottom.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
             btnBottom.disabled = true;
 
@@ -428,17 +420,12 @@
                 }
 
                 pdf.save('تصاريح_الدخول_الشاملة.pdf');
-                
-                btnTop.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
-                btnTop.disabled = false;
-                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
                 btnBottom.disabled = false;
             } catch (error) {
                 console.error(error);
                 alert("حدث خطأ أثناء تصدير ملف الـ PDF.");
-                btnTop.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
-                btnTop.disabled = false;
-                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
                 btnBottom.disabled = false;
             }
         }
