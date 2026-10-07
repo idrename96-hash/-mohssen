@@ -26,8 +26,6 @@
         label { font-weight: 600; color: var(--primary); margin: 0; }
         .btn-template { background: linear-gradient(to left, #27ae60, #2ecc71); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-family: 'Cairo', sans-serif; font-size: 12px; font-weight: 700; cursor: pointer; transition: 0.3s; }
         .btn-template:hover { background: linear-gradient(to left, #219653, #27ae60); }
-        .btn-danger { background: linear-gradient(to left, #e74c3c, #c0392b); }
-        .btn-danger:hover { background: linear-gradient(to left, #c0392b, #e74c3c); }
         
         .file-upload-wrapper { position: relative; width: 100%; height: 60px; border: 2px dashed #e1e4e8; border-radius: 8px; display: flex; align-items: center; justify-content: center; background-color: #fafafa; cursor: pointer; transition: 0.3s; margin-bottom: 15px; }
         .file-upload-wrapper:hover { border-color: var(--primary-light); background-color: #f1f6ff; }
@@ -39,10 +37,6 @@
         .btn-permit:hover { background: linear-gradient(to left, #732d91, #8e44ad); }
         .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; }
 
-        .smart-tip {
-            display: none; background: #fff3cd; border: 2px dashed #ffecb5; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; font-weight: bold; color: #856404; line-height: 1.6;
-        }
-
         #previewContainer { margin-top: 30px; display: none; }
         
         /* تنسيق نموذج المقابلة */
@@ -52,7 +46,7 @@
         .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
         .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        /* حاوية التصريح */
+        /* حاوية التصريح الثابتة */
         .permit-wrapper {
             position: relative;
             width: 100%;
@@ -64,7 +58,7 @@
             overflow: hidden;
         }
 
-        /* تنسيق النصوص فوق صورة التصريح (قابلة للسحب) */
+        /* تنسيق النصوص فوق صورة التصريح (ثابتة تماماً بدون سحب) */
         .overlay-text {
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
@@ -73,21 +67,16 @@
             color: #000;
             white-space: nowrap;
             z-index: 10;
-            cursor: move;
-            background-color: rgba(255, 235, 59, 0.4); /* لون تمييز خفيف أثناء الضبط */
-            padding: 2px 4px;
-            border: 1px dashed #fbc02d;
-            user-select: none;
+            pointer-events: none;
         }
-        .overlay-text:hover { background-color: rgba(255, 193, 7, 0.7); }
     </style>
 </head>
 <body>
 
     <div class="container">
         <div class="top-bar">
-            <h2>إدارة واستخراج نماذج المقابلات والتصاريح</h2>
-            <a href="index.html" class="back-btn">العودة للرئيسية</a>
+            <h2>إدارة واستخراج نماذج المقابلات والتصاريح[cite: 6]</h2>
+            <a href="index.html" class="back-btn">العودة للرئيسية[cite: 6]</a>
         </div>
 
         <div class="form-group">
@@ -108,13 +97,6 @@
         <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية[cite: 6]</button>
         <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول[cite: 6]</button>
 
-        <!-- لوحة التحكم المؤقتة لسحب الأماكن واستخراج الإحداثيات -->
-        <div id="smartTip" class="smart-tip">
-            🛠️ <strong>وضع التعديل والسحب مفعّل:</strong><br>
-            اسحب الكلمات بالماوس لتستقر في منتصف الصناديق الصفراء بدقة.. وبعد الانتهاء اضغط على الزر أدناه لنسخ الإحداثيات الجديدة[cite: 6].<br><br>
-            <button class="btn-template btn-danger" onclick="exportPositionsToCode()">💾 استخراج كود الأماكن الجديد</button>
-        </div>
-
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
@@ -126,16 +108,16 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // الإحداثيات الحالية القابلة للتعديل بالسحب
+        // إحداثياتك النهائية المضبوطة بدقة
         let basePositions = {
-            'f-name': { top: 23.15, right: 26.10 },
+            'f-name': { top: 23.15, right: 36.40 },
             'f-nat': { top: 26.74, right: 37.96 },
-            'f-id': { top: 30.41, right: 35.54 },
-            'f-exp': { top: 34.10, right: 54.72 },
-            'f-job1': { top: 38.03, right: 34.08 },
+            'f-id': { top: 30.41, right: 36.07 },
+            'f-exp': { top: 34.01, right: 54.98 },
+            'f-job1': { top: 37.94, right: 35.00 },
             'f-job2': { top: 37.87, right: 56.75 },
-            'f-comp': { top: 45.47, right: 34.99 },
-            'f-spon': { top: 52.54, right: 48.04 },
+            'f-comp': { top: 45.28, right: 34.46 },
+            'f-spon': { top: 52.54, right: 39.72 },
             'f-phone': { top: 59.29, right: 39.54 }
         };
 
@@ -204,13 +186,11 @@
 
         function generateAllForms() {
             if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
-            document.getElementById('smartTip').style.display = 'none';
             renderForms('interview');
         }
 
         function generatePermits() {
             if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
-            document.getElementById('smartTip').style.display = 'block';
             renderForms('permit');
         }
 
@@ -309,7 +289,7 @@
                     
                     let overlayHtml = fields.map(f => {
                         let pos = basePositions[f.id];
-                        return `<div class="overlay-text" data-field="${f.id}" style="top: ${pos.top}%; right: ${pos.right}%;">${f.val}</div>`;
+                        return `<div class="overlay-text" style="top: ${pos.top}%; right: ${pos.right}%;">${f.val}</div>`;
                     }).join('');
 
                     viewContainer.innerHTML += `
@@ -328,70 +308,6 @@
         }
 
         function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة[cite: 6]."); }
-
-        // ==========================================
-        // كود السحب المباشر لالتقاط الإحداثيات الجديدة
-        // ==========================================
-        let isDragging = false;
-        let currentElement = null;
-        let startX, startY, initialTop, initialRight;
-
-        document.addEventListener('mousedown', function(e) {
-            if (e.target.classList.contains('overlay-text')) {
-                isDragging = true;
-                currentElement = e.target;
-                startX = e.clientX;
-                startY = e.clientY;
-                initialTop = parseFloat(currentElement.style.top);
-                initialRight = parseFloat(currentElement.style.right);
-                currentElement.style.cursor = 'grabbing';
-                e.preventDefault();
-            }
-        });
-
-        document.addEventListener('mousemove', function(e) {
-            if (isDragging && currentElement) {
-                let dx = e.clientX - startX;
-                let dy = e.clientY - startY;
-                let parentRect = currentElement.parentElement.getBoundingClientRect();
-                
-                let topPercentChange = (dy / parentRect.height) * 100;
-                let rightPercentChange = -(dx / parentRect.width) * 100;
-
-                currentElement.style.top = (initialTop + topPercentChange) + '%';
-                currentElement.style.right = (initialRight + rightPercentChange) + '%';
-            }
-        });
-
-        document.addEventListener('mouseup', function(e) {
-            if (isDragging && currentElement) {
-                isDragging = false;
-                currentElement.style.cursor = 'move';
-                
-                let fieldId = currentElement.getAttribute('data-field');
-                let finalTop = parseFloat(currentElement.style.top);
-                let finalRight = parseFloat(currentElement.style.right);
-
-                basePositions[fieldId].top = finalTop;
-                basePositions[fieldId].right = finalRight;
-
-                // تحديث مكان الكلمة في كل النماذج المعروضة فوراً
-                document.querySelectorAll(`.overlay-text[data-field="${fieldId}"]`).forEach(el => {
-                    el.style.top = finalTop + '%';
-                    el.style.right = finalRight + '%';
-                });
-                currentElement = null;
-            }
-        });
-
-        function exportPositionsToCode() {
-            let codeStr = `let basePositions = {\n`;
-            for (let key in basePositions) {
-                codeStr += `    '${key}': { top: ${basePositions[key].top.toFixed(2)}, right: ${basePositions[key].right.toFixed(2)} },\n`;
-            }
-            codeStr += `};`;
-            prompt("انسخ هذه الإحداثيات الجديدة وضعها في الكود لدعمها على الرابط:", codeStr);
-        }
     </script>
 </body>
 </html>
