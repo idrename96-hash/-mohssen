@@ -9,8 +9,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         :root {
@@ -33,39 +31,11 @@
         .file-upload-wrapper:hover { border-color: var(--primary-light); background-color: #f1f6ff; }
         .file-upload-wrapper input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         
-        /* تنسيق صندوق خيارات نوع التصريح */
-        .permit-type-box {
-            background: #f8f9fa;
-            border: 2px solid #e1e4e8;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 25px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        .permit-type-box label {
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-        }
-        .permit-type-box input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
-
-        .btn { background: linear-gradient(to left, var(--primary), var(--primary-light)); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 10px; }
+        .btn { background: linear-gradient(to left, var(--primary), var(--primary-light)); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; }
         .btn:hover { background: linear-gradient(to left, var(--accent), #1de9b6); }
-        .btn-permit { background: linear-gradient(to left, #8e44ad, #9b59b6); }
+        .btn-permit { background: linear-gradient(to left, #8e44ad, #9b59b6); margin-top: 15px; }
         .btn-permit:hover { background: linear-gradient(to left, #732d91, #8e44ad); }
-        .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; width: 100%; }
+        .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; }
 
         #previewContainer { margin-top: 30px; display: none; }
         
@@ -100,23 +70,12 @@
             pointer-events: none;
         }
 
-        /* تنسيق اسم المشروع */
+        /* تكبير وتخصيص خط اسم المشروع ليكون بارزاً */
         .overlay-project {
             font-size: 16px !important;
             font-family: 'Arial', 'Cairo', sans-serif;
             font-weight: bold;
-            color: #000 !important;
-        }
-
-        /* تنسيق علامة التحديد */
-        .overlay-checkbox {
-            position: absolute;
-            width: 12px !important;
-            height: 12px !important;
-            background-color: #000 !important;
-            font-size: 0px !important;
-            z-index: 10;
-            pointer-events: none;
+            color: #000; !important;
         }
     </style>
 </head>
@@ -130,38 +89,26 @@
 
         <div class="form-group">
             <div class="label-container">
-                <label>الخطوة 1: حمل قالب الإكسيل المنظم:</label>
+                <label>الخطوة 1: حمل قالب الإكسيل المنظم</label>
                 <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
+            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات</label>
             <div class="file-upload-wrapper">
                 <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
             </div>
         </div>
 
-        <!-- خيارات نوع التصريح -->
-        <div class="form-group">
-            <label>الخطوة 3: حدد نوع طلب التصريح (كما في الورقة):</label>
-            <div class="permit-type-box">
-                <label><input type="radio" name="permitTypeOpt" value="new" checked> جديد</label>
-                <label><input type="radio" name="permitTypeOpt" value="lost"> فاقد</label>
-                <label><input type="radio" name="permitTypeOpt" value="damaged"> تالف</label>
-                <label><input type="radio" name="permitTypeOpt" value="renew"> تجديد</label>
-            </div>
-        </div>
-
-        <!-- تبديل الأماكن: تصاريح الدخول أولاً ثم المقابلات الشخصية -->
-        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
         <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية</button>
+        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
 
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد</button>
+            <button id="downloadWordBtn" class="btn btn-success" onclick="exportToWord()">📥 طباعة النماذج أو حفظها (Ctrl+P)[cite: 6]</button>
         </div>
     </div>
 
@@ -169,6 +116,7 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
+        // إحداثيات الحقول الأساسية + إحداثيات اسم المشروع في الأعلى
         let basePositions = {
             'f-name': { top: 23.15, right: 36.40 },
             'f-nat': { top: 26.74, right: 37.96 },
@@ -179,11 +127,7 @@
             'f-comp': { top: 45.28, right: 35.70 },
             'f-spon': { top: 52.54, right: 39.72 },
             'f-phone': { top: 59.29, right: 39.54 },
-            'f-project': { top: 11.00, right: 28.00 },
-            'f-new': { top: 4.85, right: 18.2 },       
-            'f-lost': { top: 4.85, right: 29.2 },      
-            'f-damaged': { top: 4.85, right: 40.2 },   
-            'f-renew': { top: 4.85, right: 51.2 }      
+            'f-project': { top: 11.00, right: 28.00 } // إحداثيات اسم المشروع في أعلى التصريح
         };
 
         const jobCriteria = {
@@ -231,13 +175,13 @@
                 });
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
-            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف[cite: 6]."); }
         }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}[cite: 6]`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
@@ -250,12 +194,12 @@
         }
 
         function generateAllForms() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
             renderForms('interview');
         }
 
         function generatePermits() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
             renderForms('permit');
         }
 
@@ -263,8 +207,6 @@
             const viewContainer = document.getElementById('sheetsView');
             viewContainer.innerHTML = '';
             let generatedCount = 0;
-
-            let selectedPermitType = document.querySelector('input[name="permitTypeOpt"]:checked').value;
 
             for (let i = 1; i < loadedEmployees.length; i++) {
                 let row = loadedEmployees[i];
@@ -281,7 +223,7 @@
                 let birthDate = formatExcelDate(row[7]);
                 let phone = String(row[8] || '');
                 let sponsorName = String(row[10] || '');
-                let projectName = String(row[11] || '').trim();
+                let projectName = String(row[11] || '').trim(); // جلب اسم المشروع من العمود الجديد
 
                 if (!currentJob) currentJob = 'عامل';
                 let today = new Date().toISOString().slice(0, 10).replace(/-/g, '/');
@@ -353,18 +295,8 @@
                         { id: 'f-comp', val: 'شركة البحيرات الدولية' },
                         { id: 'f-spon', val: sponsorName },
                         { id: 'f-phone', val: phone },
-                        { id: 'f-project', val: projectName, class: 'overlay-project' }
+                        { id: 'f-project', val: projectName, class: 'overlay-project' } // ربط حقل المشروع بالتنسيق المميز
                     ];
-
-                    if (selectedPermitType === 'new') {
-                        fields.push({ id: 'f-new', val: '', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'lost') {
-                        fields.push({ id: 'f-lost', val: '', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'damaged') {
-                        fields.push({ id: 'f-damaged', val: '', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'renew') {
-                        fields.push({ id: 'f-renew', val: '', class: 'overlay-checkbox' });
-                    }
                     
                     let overlayHtml = fields.map(f => {
                         let pos = basePositions[f.id];
@@ -374,7 +306,7 @@
 
                     viewContainer.innerHTML += `
                         <div class="permit-wrapper">
-                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج[cite: 6]">
                             ${overlayHtml}
                         </div>
                     `;
@@ -382,53 +314,12 @@
                 generatedCount++;
             }
 
-            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
             document.getElementById('previewContainer').style.display = 'block';
-            document.getElementById('downloadPdfBtn').style.display = 'block';
+            document.getElementById('downloadWordBtn').style.display = 'block';
         }
 
-        async function downloadAllAsPDF() {
-            const { jsPDF } = window.jspdf;
-            const sheets = document.querySelectorAll('.permit-wrapper, .interview-sheet');
-            
-            if (sheets.length === 0) {
-                alert("لا توجد نماذج مولدة للتحميل!");
-                return;
-            }
-
-            const btnBottom = document.getElementById('downloadPdfBtn');
-            btnBottom.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
-            btnBottom.disabled = true;
-
-            try {
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                for (let i = 0; i < sheets.length; i++) {
-                    let sheet = sheets[i];
-                    let canvas = await html2canvas(sheet, { scale: 2, useCORS: true });
-                    let imgData = canvas.toDataURL('image/jpeg', 1.0);
-                    
-                    let imgWidth = 210; 
-                    let pageHeight = 295; 
-                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    
-                    if (i > 0) {
-                        pdf.addPage();
-                    }
-                    
-                    pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
-                }
-
-                pdf.save('تصاريح_الدخول_الشاملة.pdf');
-                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
-                btnBottom.disabled = false;
-            } catch (error) {
-                console.error(error);
-                alert("حدث خطأ أثناء تصدير ملف الـ PDF.");
-                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
-                btnBottom.disabled = false;
-            }
-        }
+        function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة[cite: 6]."); }
     </script>
 </body>
 </html>
