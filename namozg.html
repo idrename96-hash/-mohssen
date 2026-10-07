@@ -108,14 +108,15 @@
             color: #000 !important;
         }
 
-        /* تنسيق علامة التحديد السوداء المربعة (█) للخانات بالأعلى */
+/* تنسيق علامة التحديد السوداء المربعة (█) */
         .overlay-checkbox {
             position: absolute;
-            font-size: 18px;
+            font-size: 14px; /* تحكم في حجم المربع (تصغيراً أو تكبيراً) */
             font-weight: 900;
             color: #000;
             z-index: 10;
             pointer-events: none;
+            line-height: 1; /* لضبط التباعد العمودي للمربع */
         }
     </style>
 </head>
