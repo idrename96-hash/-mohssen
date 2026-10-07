@@ -46,7 +46,7 @@
         .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
         .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        /* حاوية التصريح */
+        /* حاوية التصريح الثابتة */
         .permit-wrapper {
             position: relative;
             width: 100%;
@@ -58,7 +58,7 @@
             overflow: hidden;
         }
 
-        /* تنسيق النصوص فوق صورة التصريح (ثابتة وبدون إزعاج) */
+        /* تنسيق النصوص فوق صورة التصريح */
         .overlay-text {
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
@@ -87,15 +87,7 @@
         </div>
 
         <div class="form-group">
-            <label>الخطوة 2: ارفع "صورة" النموذج الفارغ (JPG أو PNG):</label>
-            <div class="file-upload-wrapper" style="border-color: #8e44ad; background-color: #fbf5ff;">
-                <span id="bgImageText" style="color: #8e44ad;">🖼️ اضغط هنا لاختيار صورة النموذج</span>
-                <input type="file" id="bgImage" accept="image/png, image/jpeg" onchange="handleBgImage(this)">
-            </div>
-        </div>
-
-        <div class="form-group">
-            <label>الخطوة 3: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
+            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات:</label>
             <div class="file-upload-wrapper">
                 <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
@@ -114,9 +106,10 @@
 
     <script>
         let loadedEmployees = [];
-        let bgImageUrl = '';
+        // رابط مباشر للصورة من نفس مجلد المشروع على جيت هب
+        const bgImageUrl = 'permit_bg.jpg'; 
 
-        // الإحداثيات الجديدة المحدثة بدقة
+        // إحداثياتك الدقيقة المعتمدة
         let basePositions = {
             'f-name': { top: 23.23, right: 38.07 },
             'f-nat': { top: 26.82, right: 40.18 },
@@ -177,16 +170,6 @@
             } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
         }
 
-        function handleBgImage(input) {
-            const file = input.files[0];
-            if (file) {
-                document.getElementById('bgImageText').innerText = `✔ تم اختيار الصورة بنجاح`;
-                const reader = new FileReader();
-                reader.onload = function(e) { bgImageUrl = e.target.result; }
-                reader.readAsDataURL(file);
-            }
-        }
-
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
@@ -209,7 +192,6 @@
 
         function generatePermits() {
             if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
-            if (!bgImageUrl) { alert("يرجى رفع صورة النموذج (الخطوة 2) لكي نكتب البيانات فوقها!"); return; }
             renderForms('permit');
         }
 
