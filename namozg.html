@@ -261,4 +261,59 @@
                                 <tr>
                                     <td style="font-weight: bold; background: #fdfdfd;">المهنة في الهوية</td>
                                     <td>${idJob}</td>
-                                    <td style="font-weight: bold; background: #
+                                    <td style="font-weight: bold; background: #fdfdfd;">اسم الكفيل</td>
+                                    <td style="background: #fdfdfd;">${sponsorName}</td>
+                                </tr>
+                                <tr><td colspan="5" style="background:#f9f9f9; font-weight:600; padding: 6px 10px;">أتعهد أنا شركة/ شركة البحيرات الدولية بأن جميع البيانات الموضحة أعلاه صحيحة وفى حالة ثبوت غير ذلك يتم التعامل حسب الأنظمة المتبعة بالمشروع.</td></tr>
+                                <tr><td colspan="3" style="font-weight: bold;">ختم الشركة /</td><td colspan="2" style="font-weight: bold;">التوقيع /</td></tr>
+                                <tr><td style="font-weight: bold; background:#eee;" colspan="2">البند</td><td style="font-weight: bold; background:#eee;">التقييم</td><td colspan="2" style="font-weight: bold; background:#eee;">ملاحظات</td></tr>
+                                ${criteriaRows}
+                                <tr><td colspan="5" style="font-weight: bold; background:#fafafa;">اعتماد المقابلة الشخصية</td></tr>
+                                <tr>
+                                    <td colspan="2" style="font-weight: bold;">المهندس المسئول</td>
+                                    <td colspan="3">الاسم: ....................................... &nbsp;&nbsp;&nbsp;&nbsp; التوقيع: .......................................</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" style="font-weight: bold;">القرار النهائي</td>
+                                    <td colspan="3">[ &nbsp; ] مقبول &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; [ &nbsp; ] مرفوض</td>
+                                </tr>
+                            </table>
+                        </div>
+                    `;
+                } else if (type === 'permit') {
+                    const fields = [
+                        { id: 'f-name', val: name },
+                        { id: 'f-nat', val: nationality },
+                        { id: 'f-id', val: idNum },
+                        { id: 'f-exp', val: expDate },
+                        { id: 'f-job1', val: idJob },
+                        { id: 'f-job2', val: currentJob },
+                        { id: 'f-comp', val: 'شركة البحيرات الدولية' },
+                        { id: 'f-spon', val: sponsorName },
+                        { id: 'f-phone', val: phone }
+                    ];
+                    
+                    let overlayHtml = fields.map(f => {
+                        let pos = basePositions[f.id];
+                        return `<div class="overlay-text" style="top: ${pos.top}%; right: ${pos.right}%;">${f.val}</div>`;
+                    }).join('');
+
+                    viewContainer.innerHTML += `
+                        <div style="position: relative; width: 100%; max-width: 900px; margin: 0 auto 40px auto; page-break-after: always; border: 1px solid #ddd; background: #fff;">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
+                            ${overlayHtml}
+                        </div>
+                    `;
+                }
+                generatedCount++;
+            }
+
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
+            document.getElementById('previewContainer').style.display = 'block';
+            document.getElementById('downloadWordBtn').style.display = 'block';
+        }
+
+        function exportToWord() { alert("اضغط Ctrl+P في لوحة المفاتيح، ثم اختر (حفظ بتنسيق PDF) مع تفعيل خيار Background Graphics للطباعة بأعلى دقة."); }
+    </script>
+</body>
+</html>
