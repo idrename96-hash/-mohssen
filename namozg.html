@@ -108,20 +108,15 @@
             color: #000 !important;
         }
 
-/* تنسيق علامة التحديد السوداء لتصبح مربعة الشكل */
+/* تنسيق علامة التحديد لتصبح مربعاً أسود حقيقياً بأبعاد دقيقة */
         .overlay-checkbox {
             position: absolute;
-            font-size: 11px; /* حجم الخط بداخل المربع */
-            width: 16px;     /* عرض المربع */
-            height: 13px;    /* ارتفاع المربع ليتطابق مع العرض ويصبح مربعاً */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            color: #000;
+            width: 12px !important;     /* عرض المربع */
+            height: 12px !important;    /* ارتفاع المربع ليصبح متساوياً */
+            background-color: #000 !important; /* لون التعبئة أسود */
+            font-size: 0px !important;  /* إخفاء أي نص بداخله */
             z-index: 10;
             pointer-events: none;
-            line-height: 1;
         }
     </style>
 </head>
