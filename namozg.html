@@ -46,7 +46,7 @@
         .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
         .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        /* حاوية التصريح */
+        /* حاوية التصريح الثابتة */
         .permit-wrapper {
             position: relative;
             width: 100%;
@@ -63,7 +63,7 @@
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
             font-weight: bold;
-            font-size: 13px;
+            font-size: 14px;
             color: #000;
             white-space: nowrap;
             z-index: 10;
@@ -108,17 +108,17 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // الإحداثيات المصححة بدقة لتدخل الكلمات في منتصف الصناديق الصفراء تماماً
+        // إحداثيات النسخة الأولى المرجعية المضبوطة بدقة
         let basePositions = {
-            'f-name': { top: 23.10, right: 35.00 },
-            'f-nat': { top: 26.65, right: 48.00 },
-            'f-id': { top: 30.30, right: 54.50 },
-            'f-exp': { top: 34.00, right: 78.50 },
-            'f-job1': { top: 37.75, right: 55.00 },
-            'f-job2': { top: 37.75, right: 29.50 },
-            'f-comp': { top: 45.20, right: 46.50 },
-            'f-spon': { top: 52.40, right: 46.50 },
-            'f-phone': { top: 59.10, right: 50.00 }
+            'f-name': { top: 23.15, right: 26.10 },
+            'f-nat': { top: 26.74, right: 37.96 },
+            'f-id': { top: 30.41, right: 35.54 },
+            'f-exp': { top: 34.10, right: 54.72 },
+            'f-job1': { top: 38.03, right: 34.08 },
+            'f-job2': { top: 37.87, right: 56.75 },
+            'f-comp': { top: 45.47, right: 34.99 },
+            'f-spon': { top: 52.54, right: 48.04 },
+            'f-phone': { top: 59.29, right: 39.54 }
         };
 
         const jobCriteria = {
