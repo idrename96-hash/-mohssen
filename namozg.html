@@ -58,7 +58,7 @@
             overflow: hidden;
         }
 
-        /* تنسيق النصوص فوق صورة التصريح */
+        /* تنسيق النصوص العامة فوق صورة التصريح */
         .overlay-text {
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
@@ -68,6 +68,13 @@
             white-space: nowrap;
             z-index: 10;
             pointer-events: none;
+        }
+
+        /* تكبير وتخصيص خط اسم المشروع ليكون بارزاً */
+        .overlay-project {
+            font-size: 14px !important;
+            font-weight: 900 !important;
+            color: #1e3c72 !important;
         }
     </style>
 </head>
@@ -108,7 +115,7 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // إحداثيات الحقول الأساسية + إحداثيات اسم المشروع الجديد في الأعلى
+        // إحداثيات الحقول الأساسية + إحداثيات اسم المشروع في الأعلى
         let basePositions = {
             'f-name': { top: 23.15, right: 36.40 },
             'f-nat': { top: 26.74, right: 37.96 },
@@ -287,12 +294,13 @@
                         { id: 'f-comp', val: 'شركة البحيرات الدولية' },
                         { id: 'f-spon', val: sponsorName },
                         { id: 'f-phone', val: phone },
-                        { id: 'f-project', val: projectName } // إضافة حقل المشروع ليظهر في التصريح
+                        { id: 'f-project', val: projectName, class: 'overlay-project' } // ربط حقل المشروع بالتنسيق المميز
                     ];
                     
                     let overlayHtml = fields.map(f => {
                         let pos = basePositions[f.id];
-                        return `<div class="overlay-text" style="top: ${pos.top}%; right: ${pos.right}%;">${f.val}</div>`;
+                        let extraClass = f.class ? f.class : '';
+                        return `<div class="overlay-text ${extraClass}" style="top: ${pos.top}%; right: ${pos.right}%;">${f.val}</div>`;
                     }).join('');
 
                     viewContainer.innerHTML += `
