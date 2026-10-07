@@ -108,15 +108,20 @@
             color: #000 !important;
         }
 
-/* تنسيق علامة التحديد السوداء المربعة (█) */
+/* تنسيق علامة التحديد السوداء لتصبح مربعة الشكل */
         .overlay-checkbox {
             position: absolute;
-            font-size: 14px; /* تحكم في حجم المربع (تصغيراً أو تكبيراً) */
+            font-size: 15px; /* حجم الخط بداخل المربع */
+            width: 14px;     /* عرض المربع */
+            height: 14px;    /* ارتفاع المربع ليتطابق مع العرض ويصبح مربعاً */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-weight: 900;
             color: #000;
             z-index: 10;
             pointer-events: none;
-            line-height: 1; /* لضبط التباعد العمودي للمربع */
+            line-height: 1;
         }
     </style>
 </head>
