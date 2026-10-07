@@ -58,12 +58,12 @@
             overflow: hidden;
         }
 
-        /* تنسيق النصوص فوق صورة التصريح */
+        /* تنسيق النصوص فوق صورة التصريح (تم تصغير الخط إلى 12px ليتناسب تماماً مع الصناديق) */
         .overlay-text {
             position: absolute;
             font-family: 'Arial', 'Cairo', sans-serif;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             color: #000;
             white-space: nowrap;
             z-index: 10;
@@ -108,7 +108,7 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // إحداثيات النسخة الأولى المرجعية المضبوطة بدقة
+        // الإحداثيات المرجعية الدقيقة
         let basePositions = {
             'f-name': { top: 23.15, right: 26.10 },
             'f-nat': { top: 26.74, right: 37.96 },
