@@ -65,7 +65,7 @@
         .btn:hover { background: linear-gradient(to left, var(--accent), #1de9b6); }
         .btn-permit { background: linear-gradient(to left, #8e44ad, #9b59b6); }
         .btn-permit:hover { background: linear-gradient(to left, #732d91, #8e44ad); }
-        .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; }
+        .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; width: 100%; }
 
         #previewContainer { margin-top: 30px; display: none; }
         
@@ -108,13 +108,13 @@
             color: #000 !important;
         }
 
-/* تنسيق علامة التحديد لتصبح مربعاً أسود حقيقياً بأبعاد دقيقة */
+        /* تنسيق علامة التحديد */
         .overlay-checkbox {
             position: absolute;
-            width: 12px !important;     /* عرض المربع */
-            height: 12px !important;    /* ارتفاع المربع ليصبح متساوياً */
-            background-color: #000 !important; /* لون التعبئة أسود */
-            font-size: 0px !important;  /* إخفاء أي نص بداخله */
+            width: 12px !important;
+            height: 12px !important;
+            background-color: #000 !important;
+            font-size: 0px !important;
             z-index: 10;
             pointer-events: none;
         }
@@ -130,20 +130,20 @@
 
         <div class="form-group">
             <div class="label-container">
-                <label>الخطوة 1: حمل قالب الإكسيل المنظم </label>
-                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول </button>
+                <label>الخطوة 1: حمل قالب الإكسيل المنظم[cite: 6]:</label>
+                <button class="btn-template" onclick="downloadTemplate()">📥 تحميل القالب الفارغ المجدول[cite: 6]</button>
             </div>
         </div>
 
         <div class="form-group">
-            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات</label>
+            <label>الخطوة 2: اختر ملف الإكسيل بعد تعبئته بالبيانات[cite: 6]:</label>
             <div class="file-upload-wrapper">
-                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)</span>
+                <span id="fileText">📁 اضغط هنا لاختيار ملف البيانات (Excel)[cite: 6]</span>
                 <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="handleFile(this)">
             </div>
         </div>
 
-        <!-- خيارات نوع التصريح بنفس ترتيب الورقة -->
+        <!-- خيارات نوع التصريح -->
         <div class="form-group">
             <label>الخطوة 3: حدد نوع طلب التصريح (كما في الورقة):</label>
             <div class="permit-type-box">
@@ -154,13 +154,17 @@
             </div>
         </div>
 
-        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية</button>
-        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول</button>
+        <!-- أزرار التوليد (التصاريح أولاً ثم المقابلات) -->
+        <button class="btn btn-permit" onclick="generatePermits()">📝 توليد نماذج تصاريح الدخول[cite: 6]</button>
+        <button class="btn" onclick="generateAllForms()">⚡ توليد نماذج المقابلات الشخصية[cite: 6]</button>
+
+        <!-- نسخة إضافية من زر التحميل بالأعلى لسهولة الوصول -->
+        <button id="downloadPdfBtnTop" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]</button>
 
         <div id="previewContainer">
             <h3 style="color: var(--primary); text-align: center; margin-bottom: 20px;" id="resultsTitle"></h3>
             <div id="sheetsView"></div>
-            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد</button>
+            <button id="downloadPdfBtn" class="btn btn-success" onclick="downloadAllAsPDF()">📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]</button>
         </div>
     </div>
 
@@ -168,7 +172,6 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // الإحداثيات الأساسية للبيانات ومربعات الخيارات بالأعلى (جديد، فاقد، تالف، تجديد)
         let basePositions = {
             'f-name': { top: 23.15, right: 36.40 },
             'f-nat': { top: 26.74, right: 37.96 },
@@ -180,10 +183,10 @@
             'f-spon': { top: 52.54, right: 39.72 },
             'f-phone': { top: 59.29, right: 39.54 },
             'f-project': { top: 11.00, right: 28.00 },
-            'f-new': { top: 20.40, right: 53.50 },       // مربع جديد
-            'f-lost': { top: 20.40, right: 61.90 },      // مربع فاقد
-            'f-damaged': { top: 20.40, right: 68.5 },   // مربع تالف
-            'f-renew': { top: 20.40, right: 77.8 }      // مربع تجديد
+            'f-new': { top: 4.65, right: 13.9 },       
+            'f-lost': { top: 4.65, right: 24.8 },      
+            'f-damaged': { top: 4.65, right: 35.6 },   
+            'f-renew': { top: 4.65, right: 46.5 }      
         };
 
         const jobCriteria = {
@@ -264,7 +267,6 @@
             viewContainer.innerHTML = '';
             let generatedCount = 0;
 
-            // معرفة الخيار المحدد من مجموعة الراديو (جديد، فاقد، تالف، تجديد)
             let selectedPermitType = document.querySelector('input[name="permitTypeOpt"]:checked').value;
 
             for (let i = 1; i < loadedEmployees.length; i++) {
@@ -357,15 +359,14 @@
                         { id: 'f-project', val: projectName, class: 'overlay-project' }
                     ];
 
-                    // وضع علامة التحديد (█) بناءً على الخيار المحدد في الواجهة
                     if (selectedPermitType === 'new') {
-                        fields.push({ id: 'f-new', val: '█', class: 'overlay-checkbox' });
+                        fields.push({ id: 'f-new', val: '', class: 'overlay-checkbox' });
                     } else if (selectedPermitType === 'lost') {
-                        fields.push({ id: 'f-lost', val: '█', class: 'overlay-checkbox' });
+                        fields.push({ id: 'f-lost', val: '', class: 'overlay-checkbox' });
                     } else if (selectedPermitType === 'damaged') {
-                        fields.push({ id: 'f-damaged', val: '█', class: 'overlay-checkbox' });
+                        fields.push({ id: 'f-damaged', val: '', class: 'overlay-checkbox' });
                     } else if (selectedPermitType === 'renew') {
-                        fields.push({ id: 'f-renew', val: '█', class: 'overlay-checkbox' });
+                        fields.push({ id: 'f-renew', val: '', class: 'overlay-checkbox' });
                     }
                     
                     let overlayHtml = fields.map(f => {
@@ -387,6 +388,7 @@
             document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
             document.getElementById('previewContainer').style.display = 'block';
             document.getElementById('downloadPdfBtn').style.display = 'block';
+            document.getElementById('downloadPdfBtnTop').style.display = 'block';
         }
 
         async function downloadAllAsPDF() {
@@ -398,9 +400,13 @@
                 return;
             }
 
-            const btn = document.getElementById('downloadPdfBtn');
-            btn.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
-            btn.disabled = true;
+            const btnTop = document.getElementById('downloadPdfBtnTop');
+            const btnBottom = document.getElementById('downloadPdfBtn');
+            
+            btnTop.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
+            btnTop.disabled = true;
+            btnBottom.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
+            btnBottom.disabled = true;
 
             try {
                 const pdf = new jsPDF('p', 'mm', 'a4');
@@ -422,13 +428,18 @@
                 }
 
                 pdf.save('تصاريح_الدخول_الشاملة.pdf');
-                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
-                btn.disabled = false;
+                
+                btnTop.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnTop.disabled = false;
+                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnBottom.disabled = false;
             } catch (error) {
                 console.error(error);
                 alert("حدث خطأ أثناء تصدير ملف الـ PDF.");
-                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
-                btn.disabled = false;
+                btnTop.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnTop.disabled = false;
+                btnBottom.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btnBottom.disabled = false;
             }
         }
     </script>
