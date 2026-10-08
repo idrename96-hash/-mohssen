@@ -339,7 +339,7 @@
         <div class="input-group">
             <label>اختر ملفاً أو عدة ملفات (يمكنك اختيار ملف واحد أو ملفين معاً دفعة واحدة)</label>
             <div class="file-upload-wrapper" id="wrapFiles">
-                <span class="file-upload-text" id="textFiles">📁 اختر أو اسحب ملفات الإكسيل هنا (ملف أو ملفين)</span>
+                <span class="file-upload-text" id="text1">📁 اختر أو اسحب ملفات الإكسيل هنا (ملف أو ملفين)</span>
                 <input type="file" id="excelFiles" accept=".xlsx, .xls" multiple onchange="updateFilesName()">
             </div>
         </div>
@@ -380,7 +380,7 @@
 
     function updateFilesName() {
         const fileInput = document.getElementById('excelFiles');
-        const textElement = document.getElementById('textFiles');
+        const textElement = document.getElementById('text1');
         const wrapper = document.getElementById('wrapFiles');
         
         if (fileInput.files.length > 0) {
@@ -422,43 +422,26 @@
     function processFileGeneric(data, employees) {
         if (!data || data.length === 0) return;
 
-        let sampleRow = data[0];
-        let isSecondHalfFile = false;
-
-        for (let key in sampleRow) {
-            let num = parseInt(key);
-            if (num >= 16 && num <= 31) {
-                isSecondHalfFile = true;
-                break;
-            }
-        }
-
         data.forEach(row => {
-            let idKey = Object.keys(row).find(k => k.includes("رقم الهويه") || k.includes("الهوية"));
-            let nameKey = Object.keys(row).find(k => k.includes("الإســــــــــم") || k.includes("الاسم"));
-            let profKey = Object.keys(row).find(k => k.includes("المهنه") || k.includes("المهنة"));
-            let hoursKey = Object.keys(row).find(k => k.includes("ساعات العمل"));
-
-            let id = String(idKey ? row[idKey] : '').trim().replace(/\.0$/, '');
-            let name = String(nameKey ? row[nameKey] : '').trim();
+            let id = String(row['رقم الهويه'] || '').trim().replace(/\.0$/, '');
+            let name = String(row['الإســــــــــم'] || '').trim();
 
             if (!id || id === 'undefined' || !name || name === 'undefined' || name === 'nan') return;
 
             if (!employees[id]) employees[id] = { 'رقم الهويه': id, 'الإســــــــــم': name };
 
-            for (let key in row) {
-                if (key.includes("الرقم الوظيفي")) employees[id]['الرقم الوظيفي '] = row[key];
-                if (key.includes("الجنسيه") || key.includes("الجنسية")) employees[id]['الجنسيه'] = row[key];
-                if (key.includes("الورديه") || key.includes("الوردية")) employees[id]['الورديه'] = row[key];
-                if (key.includes("مدير القسم")) employees[id]['مدير القسم'] = row[key];
-                if (key.includes("مهندس الموقع")) employees[id]['مهندس الموقع'] = row[key];
-                if (key.includes("المقاول")) employees[id]['المقاول'] = row[key];
-                if (key.includes("كاتب الدوام")) employees[id]['كاتب الدوام'] = row[key];
-            }
+            if (row['الرقم الوظيفي ']) employees[id]['الرقم الوظيفي '] = row['الرقم الوظيفي '];
+            if (row['الجنسيه']) employees[id]['الجنسيه'] = row['الجنسيه'];
+            if (row['الورديه']) employees[id]['الورديه'] = row['الورديه'];
+            if (row['مدير القسم']) employees[id]['مدير القسم'] = row['مدير القسم'];
+            if (row['مهندس الموقع']) employees[id]['مهندس الموقع'] = row['مهندس الموقع'];
+            if (row['المقاول']) employees[id]['المقاول'] = row['المقاول'];
+            if (row['كاتب الدوام']) employees[id]['كاتب الدوام'] = row['كاتب الدوام'];
 
-            let prof = String(profKey ? row[profKey] : '').trim();
-            let hours = parseFloat(hoursKey ? row[hoursKey] : 0) || 0;
+            let prof = String(row['المهنه'] || '').trim();
+            let hours = parseFloat(row['ساعات العمل']) || 0;
 
+            // التحقق هل الملف يخص النصف الأول أو الثاني بناءً على الأعمدة المتاحة
             let hasCol1to15 = false;
             let hasCol16to31 = false;
             for (let c = 1; c <= 15; c++) {
@@ -468,7 +451,9 @@
                 if (row[c] !== undefined && row[c] !== "") hasCol16to31 = true;
             }
 
-            let isFirst = hasCol1to15 ? true : (hasCol16to31 ? false : !isSecondHalfFile);
+            // إذا كان الملف يحتوي على أيام 1-15 أو لم يحتوي على أيام 16-31 نعتبره النصف الأول، وإلا فالنصف الثاني
+            let isFirst = hasCol1to15 || (!hasCol1to15 && !hasCol16to31); 
+            if (hasCol16to31 && !hasCol1to15) isFirst = false;
 
             if (isFirst) {
                 employees[id]['المهنة (من 1 إلى 15)'] = prof;
@@ -540,8 +525,8 @@
                 row['ساعات العمل (من 16 إلى 31)'] = h2 || '';
                 row['إجمالي ساعات الشهر'] = h1 + h2;
 
-                let s1 = h1 * (p1.includes('عامل') ? rateWorker : rateOther);
-                let s2 = h2 * (p1.includes('عامل') ? rateWorker : rateOther);
+                let s1 = h1 * (p1 === 'عامل' ? rateWorker : rateOther);
+                let s2 = h2 * (p1 === 'عامل' ? rateWorker : rateOther);
                 let totalSalary = Math.round(s1 + s2);
 
                 row['راتب النصف الأول (ريال)'] = s1;
