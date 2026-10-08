@@ -4,18 +4,31 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>قارئ الإقامة السعودية - الإصدار الموحد v10.30</title>
-<!-- كود حماية النطاق -->
+
+<!-- حماية أمنية صارمة تمنع التشغيل المحلي -->
 <script>
     (function() {
-        const allowedUsername = "mohssen"; // استبدل بـ اسم المستخدم الخاص بك على جيت هب
         const currentHost = window.location.hostname;
-        const currentProtocol = window.location.protocol;
-        if (!currentHost.includes(allowedUsername + ".github.io") && currentHost !== "localhost" && currentHost !== "127.0.0.1" && currentProtocol !== "file:") {
-            document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:100px; color:red; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
-            throw new Error("Unauthorized execution.");
+        const isGithub = currentHost.endsWith(".github.io");
+
+        if (!isGithub) {
+            document.write(`
+                <!DOCTYPE html>
+                <html lang="ar" dir="rtl">
+                <head><meta charset="UTF-8"><title>تنبيه أمني</title></head>
+                <body style="font-family: Tajawal, sans-serif; background-color: #0E1F1C; color: #fff; text-align: center; padding-top: 150px;">
+                    <h1 style="color: #EF5350; font-size: 32px;">⚠️ تنبيه أمني - نسخة غير مرخصة</h1>
+                    <h2 style="font-size: 20px; margin-top: 20px;">هذا النظام محمي ولا يمكن تشغيله محلياً أو أوفلاين.</h2>
+                    <p style="color: #B9CFC9; margin-top: 10px;">يجب فتحه حصرياً من خلال الرابط الرسمي للمنصة.</p>
+                </body>
+                </html>
+            `);
+            document.close();
+            throw new Error("Security Violation: Local execution blocked.");
         }
     })();
 </script>
+
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -67,7 +80,6 @@
   .key-row{display:flex; gap:8px;}
   #folderStatus{font-size:13px; color:var(--gold-soft); margin-top:8px;}
   
-  /* تصميم العداد المركزي */
   #globalCounter {
     background: #0d1b18; border: 1px solid var(--gold); border-radius: 8px;
     padding: 12px; text-align: center; margin-bottom: 16px; display: none;
@@ -192,9 +204,6 @@
 <div style="text-align:center; font-size:11px; color:#5E7A73; margin-top:10px;">نسخة v1.2  - تم التطوير بواسطة نجم</div>
 
 <script>
-// ==========================================
-// الإعدادات والروابط المخفية
-// ==========================================
 const DEFAULT_KEYS = "K87179441288957\nK84766691388957\nK81752679988957\nK87880537988957\nK86651565288957\nK86983657888957\nK82398197588957\nK86929632588957\nK83762693988957\nK83895385988957";
 const DEFAULT_SHEET_URL = "";
 
@@ -217,9 +226,6 @@ document.getElementById('saveSheetUrl').addEventListener('click', () => {
   fetchGlobalCount();
 });
 
-// ==========================================
-// العداد المركزي (من الشيت)
-// ==========================================
 function fetchGlobalCount() {
   const url = sheetUrlInput.value.trim();
   if(!url) return;
@@ -244,12 +250,14 @@ async function sendToSheet(type, payload){
   try{
     const formData = new URLSearchParams();
     formData.append('data', JSON.stringify(Object.assign({ type }, payload)));
+
     await fetch(url, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formData.toString()
     });
+
     statusEl.style.color = '#9FC2BB';
     statusEl.textContent = '📤 تم الحفظ في قاعدة البيانات بنجاح';
     fetchGlobalCount();
@@ -475,18 +483,6 @@ function extractFields(text){
       if(val.length > 1 && !invalidProfWords.some(w => val.includes(w)) && !/^\d+$/.test(val)){ profession = val; break; }
     }
   }
-  if(profession === 'غير متوفر'){
-    const commonProfessions = ['عامل', 'فني', 'مهندس', 'مراقب', 'سائق', 'محاسب', 'مساعد', 'طباخ', 'نجار', 'حداد', 'حارس', 'مدير', 'مندوب', 'مستشار', 'بناء', 'تحميل', 'تنقيل', 'منسق حركة رافعات', 'إنشاءات', 'انشاعات'];
-    for(let l of lines){
-      for(let prof of commonProfessions){
-        if(l.includes(prof) && !l.includes('صاحب العمل') && !l.includes('الجنسية')){
-          let clean = l.replace(/.*[:\-]/, '').trim();
-          if(clean.length > 1 && !invalidProfWords.some(w => clean.includes(w))){ profession = clean; break; }
-        }
-      }
-      if(profession !== 'غير متوفر') break;
-    }
-  }
 
   let empName = 'غير متوفر';
   const ignoreEmpPhrases = ['يجب التحقق', 'من الرمز', 'السريع', 'قبل اعتماد', 'التعامل مع الهوية', 'وزارة الداخلية', 'هوية مقيم', 'رقم النسخة'];
@@ -497,15 +493,6 @@ function extractFields(text){
       if(!val && i+1 < lines.length) val = lines[i+1].trim();
       for(let ph of ignoreEmpPhrases) if(val.includes(ph)) val = val.substring(0, val.indexOf(ph)).trim();
       if(val && !/^\d+$/.test(val) && val.length > 3) empName = val.replace(/[:\-]+/g, '').trim();
-    }
-  }
-  if(empName === 'غير متوفر'){
-    for(let l of lines){
-      if((l.includes('شركة') || l.includes('مؤسسة') || l.includes('مكتب')) && !l.includes('هوية') && !l.includes('رقم')){
-        let clean = l.replace(/.*[:\-]/, '').trim();
-        for(let ph of ignoreEmpPhrases) if(clean.includes(ph)) clean = clean.substring(0, clean.indexOf(ph)).trim();
-        if(clean.length > 3){ empName = clean; break; }
-      }
     }
   }
 
