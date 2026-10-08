@@ -4,22 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
-    
-    <!-- حماية نطاق خفيفة وآمنة لا تؤثر على التصميم -->
-    <script>
-        (function() {
-            const currentHost = window.location.hostname;
-            const currentProtocol = window.location.protocol;
-            const isGithub = currentHost.endsWith(".github.io");
-            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:" || currentHost === "";
-
-            if (!isGithub && !isLocal) {
-                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:150px; color:#c0392b; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
-                throw new Error("Unauthorized execution.");
-            }
-        })();
-    </script>
-
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -109,10 +93,10 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <h1>شركة البحيرات الدولية</h1>
+            <h1>شركة البحيرات </h1>
             <h2>تسجيل الدخول</h2>
             <input type="password" id="password-input" placeholder="أدخل كلمة المرور">
-            <button onclick="checkPassword()">دخول</button>
+            <button type="button" onclick="checkPassword()">دخول</button>
             <div id="error-message" class="error-msg">كلمة المرور غير صحيحة!</div>
         </div>
     </div>
