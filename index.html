@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
+    
+    <!-- حماية النطاق الخفيفة -->
+    <script>
+        (function() {
+            const currentHost = window.location.hostname;
+            const currentProtocol = window.location.protocol;
+            const isGithub = currentHost.endsWith(".github.io");
+            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:" || currentHost === "";
+
+            if (!isGithub && !isLocal) {
+                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:150px; color:#c0392b; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
+                throw new Error("Unauthorized execution.");
+            }
+        })();
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -93,10 +109,13 @@
 
     <div id="login-screen">
         <div class="login-card">
-            <h1>شركة البحيرات </h1>
+            <h1>شركة البحيرات الدولية</h1>
             <h2>تسجيل الدخول</h2>
-            <input type="password" id="password-input" placeholder="أدخل كلمة المرور">
-            <button type="button" onclick="checkPassword()">دخول</button>
+            <!-- تم استخدام form مع onsubmit لضمان استجابة الزر وزر Enter بكفاءة عالية -->
+            <form id="login-form" onsubmit="checkPassword(event)">
+                <input type="password" id="password-input" placeholder="أدخل كلمة المرور" required>
+                <button type="submit">دخول</button>
+            </form>
             <div id="error-message" class="error-msg">كلمة المرور غير صحيحة!</div>
         </div>
     </div>
@@ -137,8 +156,10 @@
     <script>
         const correctPassword = "123457";[cite: 6]
 
-        function checkPassword() {
-            const inputVal = document.getElementById('password-input').value;
+        function checkPassword(event) {
+            if (event) event.preventDefault(); // منع إعادة تحميل الصفحة الافتراضية
+            
+            const inputVal = document.getElementById('password-input').value.trim();
             const errorMsg = document.getElementById('error-message');
             
             if (inputVal === correctPassword) {
@@ -146,14 +167,9 @@
                 document.getElementById('main-content').style.display = 'block';
             } else {
                 errorMsg.style.display = 'block';
+                errorMsg.innerText = "كلمة المرور غير صحيحة!";
             }
         }
-
-        document.getElementById('password-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
     </script>
 </body>
 </html>
