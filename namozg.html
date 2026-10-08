@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>نماذج المقابلات والتصاريح | البحيرات الدولية</title>
+    <!-- كود حماية النطاق -->
+    <script>
+        (function() {
+            const allowedUsername = "mohssen";
+            const currentHost = window.location.hostname;
+            const currentProtocol = window.location.protocol;
+            if (!currentHost.includes(allowedUsername + ".github.io") && currentHost !== "localhost" && currentHost !== "127.0.0.1" && currentProtocol !== "file:") {
+                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:100px; color:red;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
+                throw new Error("Unauthorized execution.");
+            }
+        })();
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800;900&display=swap" rel="stylesheet">
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -33,33 +45,11 @@
         .file-upload-wrapper:hover { border-color: var(--primary-light); background-color: #f1f6ff; }
         .file-upload-wrapper input[type="file"] { position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; }
         
-        /* تنسيق صندوق خيارات نوع التصريح */
         .permit-type-box {
-            background: #f8f9fa;
-            border: 2px solid #e1e4e8;
-            padding: 15px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: flex;
-            gap: 25px;
-            align-items: center;
-            flex-wrap: wrap;
+            background: #f8f9fa; border: 2px solid #e1e4e8; padding: 15px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; gap: 25px; align-items: center; flex-wrap: wrap;
         }
-        .permit-type-box label {
-            cursor: pointer;
-            font-weight: 700;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 16px;
-        }
-        .permit-type-box input[type="radio"] {
-            width: 18px;
-            height: 18px;
-            accent-color: var(--primary);
-            cursor: pointer;
-        }
+        .permit-type-box label { cursor: pointer; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 8px; font-size: 16px; }
+        .permit-type-box input[type="radio"] { width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer; }
 
         .btn { background: linear-gradient(to left, var(--primary), var(--primary-light)); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; margin-bottom: 10px; }
         .btn:hover { background: linear-gradient(to left, var(--accent), #1de9b6); }
@@ -68,56 +58,16 @@
         .btn-success { background: linear-gradient(to left, var(--accent), #1de9b6); display: none; margin-top: 20px; }
 
         #previewContainer { margin-top: 30px; display: none; }
-        
-        /* تنسيق نموذج المقابلة */
         .interview-sheet { border: 2px solid var(--border-color); background: #fff; margin-bottom: 40px; font-size: 14px; direction: rtl; page-break-after: always; }
         .sheet-table { width: 100%; border-collapse: collapse; text-align: right; }
         .sheet-table th, .sheet-table td { border: 1px solid var(--border-color); padding: 8px 10px; vertical-align: middle; }
         .sheet-header { background-color: #ffff00; color: #000; font-weight: 800; font-size: 16px; padding: 10px; text-align: center; border-bottom: 2px solid var(--border-color); }
         .photo-cell { width: 15%; background: #fafafa; color: #666; font-size: 12px; font-weight: 600; text-align: center; }
 
-        /* حاوية التصريح الثابتة */
-        .permit-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 900px;
-            margin: 0 auto 40px auto;
-            page-break-after: always;
-            background: #fff;
-            border: 1px solid #ddd;
-            overflow: hidden;
-        }
-
-        /* تنسيق النصوص العامة فوق صورة التصريح */
-        .overlay-text {
-            position: absolute;
-            font-family: 'Arial', 'Cairo', sans-serif;
-            font-weight: bold;
-            font-size: 13px;
-            color: #000;
-            white-space: nowrap;
-            z-index: 10;
-            pointer-events: none;
-        }
-
-        /* تنسيق اسم المشروع */
-        .overlay-project {
-            font-size: 16px !important;
-            font-family: 'Arial', 'Cairo', sans-serif;
-            font-weight: bold;
-            color: #000 !important;
-        }
-
-/* تنسيق علامة التحديد لتصبح مربعاً أسود حقيقياً بأبعاد دقيقة */
-        .overlay-checkbox {
-            position: absolute;
-            width: 12px !important;     /* عرض المربع */
-            height: 12px !important;    /* ارتفاع المربع ليصبح متساوياً */
-            background-color: #000 !important; /* لون التعبئة أسود */
-            font-size: 0px !important;  /* إخفاء أي نص بداخله */
-            z-index: 10;
-            pointer-events: none;
-        }
+        .permit-wrapper { position: relative; width: 100%; max-width: 900px; margin: 0 auto 40px auto; page-break-after: always; background: #fff; border: 1px solid #ddd; overflow: hidden; }
+        .overlay-text { position: absolute; font-family: 'Arial', 'Cairo', sans-serif; font-weight: bold; font-size: 13px; color: #000; white-space: nowrap; z-index: 10; pointer-events: none; }
+        .overlay-project { font-size: 16px !important; font-family: 'Arial', 'Cairo', sans-serif; font-weight: bold; color: #000 !important; }
+        .overlay-checkbox { position: absolute; width: 12px !important; height: 12px !important; background-color: #000 !important; font-size: 0px !important; z-index: 10; pointer-events: none; }
     </style>
 </head>
 <body>
@@ -143,7 +93,6 @@
             </div>
         </div>
 
-        <!-- خيارات نوع التصريح بنفس ترتيب الورقة -->
         <div class="form-group">
             <label>الخطوة 3: حدد نوع طلب التصريح (كما في الورقة):</label>
             <div class="permit-type-box">
@@ -168,7 +117,6 @@
         let loadedEmployees = [];
         const bgImageUrl = 'permit_bg.jpg'; 
 
-        // الإحداثيات الأساسية للبيانات ومربعات الخيارات بالأعلى (جديد، فاقد، تالف، تجديد)
         let basePositions = {
             'f-name': { top: 23.15, right: 36.40 },
             'f-nat': { top: 26.74, right: 37.96 },
@@ -180,10 +128,10 @@
             'f-spon': { top: 52.54, right: 39.72 },
             'f-phone': { top: 59.29, right: 39.54 },
             'f-project': { top: 11.00, right: 28.00 },
-            'f-new': { top: 20.40, right: 53.50 },       // مربع جديد
-            'f-lost': { top: 20.40, right: 61.90 },      // مربع فاقد
-            'f-damaged': { top: 20.40, right: 68.5 },   // مربع تالف
-            'f-renew': { top: 20.40, right: 77.8 }      // مربع تجديد
+            'f-new': { top: 20.40, right: 53.50 },
+            'f-lost': { top: 20.40, right: 61.90 },
+            'f-damaged': { top: 20.40, right: 68.5 },
+            'f-renew': { top: 20.40, right: 77.8 }
         };
 
         const jobCriteria = {
@@ -231,13 +179,13 @@
                 });
                 const buffer = await workbook.xlsx.writeBuffer();
                 saveAs(new Blob([buffer], { type: "application/octet-stream" }), "قالب_بيانات_العمالة.xlsx");
-            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف[cite: 6]."); }
+            } catch (error) { alert("حدث خطأ أثناء إنشاء الملف."); }
         }
 
         function handleFile(input) {
             const file = input.files[0];
             if (file) {
-                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}[cite: 6]`;
+                document.getElementById('fileText').innerText = `✔ تم اختيار ملف الإكسيل: ${file.name}`;
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const data = new Uint8Array(e.target.result);
@@ -250,12 +198,12 @@
         }
 
         function generateAllForms() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('interview');
         }
 
         function generatePermits() {
-            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح[cite: 6]."); return; }
+            if (loadedEmployees.length <= 1) { alert("الرجاء رفع ملف الإكسيل واختياره بشكل صحيح."); return; }
             renderForms('permit');
         }
 
@@ -263,8 +211,6 @@
             const viewContainer = document.getElementById('sheetsView');
             viewContainer.innerHTML = '';
             let generatedCount = 0;
-
-            // معرفة الخيار المحدد من مجموعة الراديو (جديد، فاقد، تالف، تجديد)
             let selectedPermitType = document.querySelector('input[name="permitTypeOpt"]:checked').value;
 
             for (let i = 1; i < loadedEmployees.length; i++) {
@@ -345,28 +291,16 @@
                     `;
                 } else if (type === 'permit') {
                     const fields = [
-                        { id: 'f-name', val: name },
-                        { id: 'f-nat', val: nationality },
-                        { id: 'f-id', val: idNum },
-                        { id: 'f-exp', val: expDate },
-                        { id: 'f-job1', val: idJob },
-                        { id: 'f-job2', val: currentJob },
-                        { id: 'f-comp', val: 'شركة البحيرات الدولية' },
-                        { id: 'f-spon', val: sponsorName },
-                        { id: 'f-phone', val: phone },
-                        { id: 'f-project', val: projectName, class: 'overlay-project' }
+                        { id: 'f-name', val: name }, { id: 'f-nat', val: nationality }, { id: 'f-id', val: idNum },
+                        { id: 'f-exp', val: expDate }, { id: 'f-job1', val: idJob }, { id: 'f-job2', val: currentJob },
+                        { id: 'f-comp', val: 'شركة البحيرات الدولية' }, { id: 'f-spon', val: sponsorName },
+                        { id: 'f-phone', val: phone }, { id: 'f-project', val: projectName, class: 'overlay-project' }
                     ];
 
-                    // وضع علامة التحديد (█) بناءً على الخيار المحدد في الواجهة
-                    if (selectedPermitType === 'new') {
-                        fields.push({ id: 'f-new', val: '█', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'lost') {
-                        fields.push({ id: 'f-lost', val: '█', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'damaged') {
-                        fields.push({ id: 'f-damaged', val: '█', class: 'overlay-checkbox' });
-                    } else if (selectedPermitType === 'renew') {
-                        fields.push({ id: 'f-renew', val: '█', class: 'overlay-checkbox' });
-                    }
+                    if (selectedPermitType === 'new') fields.push({ id: 'f-new', val: '█', class: 'overlay-checkbox' });
+                    else if (selectedPermitType === 'lost') fields.push({ id: 'f-lost', val: '█', class: 'overlay-checkbox' });
+                    else if (selectedPermitType === 'damaged') fields.push({ id: 'f-damaged', val: '█', class: 'overlay-checkbox' });
+                    else if (selectedPermitType === 'renew') fields.push({ id: 'f-renew', val: '█', class: 'overlay-checkbox' });
                     
                     let overlayHtml = fields.map(f => {
                         let pos = basePositions[f.id];
@@ -376,7 +310,7 @@
 
                     viewContainer.innerHTML += `
                         <div class="permit-wrapper">
-                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج[cite: 6]">
+                            <img src="${bgImageUrl}" style="width: 100%; display: block; user-select: none; pointer-events: none;" alt="خلفية النموذج">
                             ${overlayHtml}
                         </div>
                     `;
@@ -384,7 +318,7 @@
                 generatedCount++;
             }
 
-            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح[cite: 6]`;
+            document.getElementById('resultsTitle').innerText = `تم توليد نماذج لـ ${generatedCount} موظفاً بنجاح`;
             document.getElementById('previewContainer').style.display = 'block';
             document.getElementById('downloadPdfBtn').style.display = 'block';
         }
@@ -393,10 +327,7 @@
             const { jsPDF } = window.jspdf;
             const sheets = document.querySelectorAll('.permit-wrapper, .interview-sheet');
             
-            if (sheets.length === 0) {
-                alert("لا توجد نماذج مولدة للتحميل!");
-                return;
-            }
+            if (sheets.length === 0) { alert("لا توجد نماذج مولدة للتحميل!"); return; }
 
             const btn = document.getElementById('downloadPdfBtn');
             btn.innerText = "⏳ جاري إعداد وتنزيل ملف الـ PDF الشامل...";
@@ -404,30 +335,20 @@
 
             try {
                 const pdf = new jsPDF('p', 'mm', 'a4');
-                
                 for (let i = 0; i < sheets.length; i++) {
                     let sheet = sheets[i];
                     let canvas = await html2canvas(sheet, { scale: 2, useCORS: true });
                     let imgData = canvas.toDataURL('image/jpeg', 1.0);
-                    
-                    let imgWidth = 210; 
-                    let pageHeight = 295; 
-                    let imgHeight = (canvas.height * imgWidth) / canvas.width;
-                    
-                    if (i > 0) {
-                        pdf.addPage();
-                    }
-                    
+                    let imgWidth = 210, imgHeight = (canvas.height * imgWidth) / canvas.width;
+                    if (i > 0) pdf.addPage();
                     pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth, imgHeight);
                 }
-
                 pdf.save('تصاريح_الدخول_الشاملة.pdf');
-                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
                 btn.disabled = false;
             } catch (error) {
-                console.error(error);
                 alert("حدث خطأ أثناء تصدير ملف الـ PDF.");
-                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد[cite: 6]";
+                btn.innerText = "📥 تحميل جميع التصاريح كملف PDF واحد";
                 btn.disabled = false;
             }
         }
