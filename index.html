@@ -5,17 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
     
-    <!-- حماية النطاق الخفيفة -->
+    <!-- حماية صارمة: منع التشغيل المحلي (file://) وقصره على رابط جيت هب حصرياً -->
     <script>
         (function() {
             const currentHost = window.location.hostname;
             const currentProtocol = window.location.protocol;
+            
+            // التحقق من أن النطاق ينتهي بـ github.io حصرياً (حظر التشغيل المحلي أو الخارجي)
             const isGithub = currentHost.endsWith(".github.io");
-            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:" || currentHost === "";
 
-            if (!isGithub && !isLocal) {
-                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:150px; color:#c0392b; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
-                throw new Error("Unauthorized execution.");
+            if (!isGithub) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: Cairo, sans-serif; text-align: center; margin-top: 150px; color: #c0392b; direction: rtl;">
+                        <h1>⚠️ تنبيه أمني - نسخة غير مرخصة</h1>
+                        <h2>هذا النظام محمي ولا يمكن تشغيله محلياً أو أوفلاين. يجب فتحه من خلال الرابط الرسمي للمنصة.</h2>
+                    </div>
+                `;
+                throw new Error("Security Violation: Local execution blocked.");
             }
         })();
     </script>
@@ -111,7 +117,6 @@
         <div class="login-card">
             <h1>شركة البحيرات الدولية</h1>
             <h2>تسجيل الدخول</h2>
-            <!-- تم استخدام form مع onsubmit لضمان استجابة الزر وزر Enter بكفاءة عالية -->
             <form id="login-form" onsubmit="checkPassword(event)">
                 <input type="password" id="password-input" placeholder="أدخل كلمة المرور" required>
                 <button type="submit">دخول</button>
@@ -154,10 +159,10 @@
     </div>
 
     <script>
-        const correctPassword = "123457";[cite: 6]
+        const correctPassword = "123457";
 
         function checkPassword(event) {
-            if (event) event.preventDefault(); // منع إعادة تحميل الصفحة الافتراضية
+            if (event) event.preventDefault();
             
             const inputVal = document.getElementById('password-input').value.trim();
             const errorMsg = document.getElementById('error-message');
