@@ -97,7 +97,7 @@
         .file-upload-wrapper {
             position: relative;
             width: 100%;
-            height: 60px;
+            height: 70px;
             border: 2px dashed var(--border-color);
             border-radius: 8px;
             display: flex;
@@ -127,6 +127,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            text-align: center;
+            padding: 0 10px;
         }
 
         .file-loaded {
@@ -238,7 +240,7 @@
         .summary-box .sub-val { display: block; font-size: 12px; color: #888; font-weight: 600; margin-top: 4px; }
 
         /* ==========================================
-           تنسيقات طباعة الظرف (اسم الشركة، مشروع توسعة المطاف، عرض 20 سم)
+           تنسيقات طباعة الظرف
            ========================================== */
         #envelopesPrintArea { display: none; }
 
@@ -334,24 +336,15 @@
         </div>
 
         <h3 style="color:var(--primary);">2. ملفات الحضور</h3>
-        <div class="grid-2">
-            <div class="input-group">
-                <label>النصف الأول (يوم 1 إلى 15)</label>
-                <div class="file-upload-wrapper" id="wrap1">
-                    <span class="file-upload-text" id="text1">📁 اختر أو اسحب ملف الإكسيل</span>
-                    <input type="file" id="fileHalf1" accept=".xlsx, .xls" onchange="updateFileName('fileHalf1', 'text1', 'wrap1')">
-                </div>
-            </div>
-            <div class="input-group">
-                <label>النصف الثاني (يوم 16 إلى 31)</label>
-                <div class="file-upload-wrapper" id="wrap2">
-                    <span class="file-upload-text" id="text2">📁 اختر أو اسحب ملف الإكسيل</span>
-                    <input type="file" id="fileHalf2" accept=".xlsx, .xls" onchange="updateFileName('fileHalf2', 'text2', 'wrap2')">
-                </div>
+        <div class="input-group">
+            <label>اختر ملفاً أو عدة ملفات (يمكنك اختيار ملف واحد أو ملفين معاً دفعة واحدة)</label>
+            <div class="file-upload-wrapper" id="wrapFiles">
+                <span class="file-upload-text" id="textFiles">📁 اختر أو اسحب ملفات الإكسيل هنا (ملف أو ملفين)</span>
+                <input type="file" id="excelFiles" accept=".xlsx, .xls" multiple onchange="updateFilesName()">
             </div>
         </div>
 
-        <button class="btn" onclick="processFiles()">⚙️ دمج، معالجة، وحساب الفئات</button>
+        <button class="btn" style="margin-top: 20px;" onclick="processFiles()">⚙️ معالجة وحساب الفئات والرواتب</button>
         <div id="status" class="status"></div>
 
         <!-- خلاصة البنك -->
@@ -385,16 +378,17 @@
     const denominations = [500, 200, 100, 50, 20, 10, 5, 1];
     let bankTotals = {};
 
-    function updateFileName(inputId, textId, wrapId) {
-        const fileInput = document.getElementById(inputId);
-        const textElement = document.getElementById(textId);
-        const wrapper = document.getElementById(wrapId);
+    function updateFilesName() {
+        const fileInput = document.getElementById('excelFiles');
+        const textElement = document.getElementById('textFiles');
+        const wrapper = document.getElementById('wrapFiles');
         
         if (fileInput.files.length > 0) {
-            textElement.innerHTML = `✔️ تم اختيار: ${fileInput.files[0].name}`;
+            let names = Array.from(fileInput.files).map(f => f.name).join('، ');
+            textElement.innerHTML = `✔️ تم اختيار: ${names}`;
             wrapper.classList.add('file-loaded');
         } else {
-            textElement.innerHTML = `📁 اختر أو اسحب ملف الإكسيل`;
+            textElement.innerHTML = `📁 اختر أو اسحب ملفات الإكسيل هنا (ملف أو ملفين)`;
             wrapper.classList.remove('file-loaded');
         }
     }
@@ -409,81 +403,112 @@
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                const firstSheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[firstSheetName];
-                const jsonData = XLSX.utils.sheet_to_json(worksheet, { range: 1, defval: "" });
-                resolve(jsonData);
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { range: 0, defval: "" });
+                    resolve(jsonData);
+                } catch (err) {
+                    reject(err);
+                }
             };
             reader.onerror = (error) => reject(error);
             reader.readAsArrayBuffer(file);
         });
     }
 
+    function processFileGeneric(data, employees) {
+        if (!data || data.length === 0) return;
+
+        let sampleRow = data[0];
+        let isSecondHalfFile = false;
+
+        for (let key in sampleRow) {
+            let num = parseInt(key);
+            if (num >= 16 && num <= 31) {
+                isSecondHalfFile = true;
+                break;
+            }
+        }
+
+        data.forEach(row => {
+            let idKey = Object.keys(row).find(k => k.includes("رقم الهويه") || k.includes("الهوية"));
+            let nameKey = Object.keys(row).find(k => k.includes("الإســــــــــم") || k.includes("الاسم"));
+            let profKey = Object.keys(row).find(k => k.includes("المهنه") || k.includes("المهنة"));
+            let hoursKey = Object.keys(row).find(k => k.includes("ساعات العمل"));
+
+            let id = String(idKey ? row[idKey] : '').trim().replace(/\.0$/, '');
+            let name = String(nameKey ? row[nameKey] : '').trim();
+
+            if (!id || id === 'undefined' || !name || name === 'undefined' || name === 'nan') return;
+
+            if (!employees[id]) employees[id] = { 'رقم الهويه': id, 'الإســــــــــم': name };
+
+            for (let key in row) {
+                if (key.includes("الرقم الوظيفي")) employees[id]['الرقم الوظيفي '] = row[key];
+                if (key.includes("الجنسيه") || key.includes("الجنسية")) employees[id]['الجنسيه'] = row[key];
+                if (key.includes("الورديه") || key.includes("الوردية")) employees[id]['الورديه'] = row[key];
+                if (key.includes("مدير القسم")) employees[id]['مدير القسم'] = row[key];
+                if (key.includes("مهندس الموقع")) employees[id]['مهندس الموقع'] = row[key];
+                if (key.includes("المقاول")) employees[id]['المقاول'] = row[key];
+                if (key.includes("كاتب الدوام")) employees[id]['كاتب الدوام'] = row[key];
+            }
+
+            let prof = String(profKey ? row[profKey] : '').trim();
+            let hours = parseFloat(hoursKey ? row[hoursKey] : 0) || 0;
+
+            let hasCol1to15 = false;
+            let hasCol16to31 = false;
+            for (let c = 1; c <= 15; c++) {
+                if (row[c] !== undefined && row[c] !== "") hasCol1to15 = true;
+            }
+            for (let c = 16; c <= 31; c++) {
+                if (row[c] !== undefined && row[c] !== "") hasCol16to31 = true;
+            }
+
+            let isFirst = hasCol1to15 ? true : (hasCol16to31 ? false : !isSecondHalfFile);
+
+            if (isFirst) {
+                employees[id]['المهنة (من 1 إلى 15)'] = prof;
+                employees[id]['ساعات العمل (من 1 إلى 15)'] = (employees[id]['ساعات العمل (من 1 إلى 15)'] || 0) + hours;
+                for (let i = 1; i <= 15; i++) {
+                    if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
+                }
+            } else {
+                employees[id]['المهنة (من 16 إلى 31)'] = prof;
+                employees[id]['ساعات العمل (من 16 إلى 31)'] = (employees[id]['ساعات العمل (من 16 إلى 31)'] || 0) + hours;
+                for (let i = 16; i <= 31; i++) {
+                    if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
+                }
+            }
+        });
+    }
+
     async function processFiles() {
-        const file1 = document.getElementById('fileHalf1').files[0];
-        const file2 = document.getElementById('fileHalf2').files[0];
+        const fileInput = document.getElementById('excelFiles');
         const rateWorker = parseFloat(document.getElementById('rateWorker').value);
         const rateOther = parseFloat(document.getElementById('rateOther').value);
 
-        if (!file1 || !file2) {
-            showStatus("⚠️ الرجاء اختيار ملفي النصف الأول والثاني.", "error");
+        if (!fileInput.files || fileInput.files.length === 0) {
+            showStatus("⚠️ الرجاء اختيار ملف إكسيل واحد على الأقل للمتابعة.", "error");
             return;
         }
 
-        showStatus("⏳ جاري تحليل، دمج وحساب الفئات... يرجى الانتظار", "loading");
+        showStatus("⏳ جاري تحليل ومعالجة البيانات... يرجى الانتظار", "loading");
         document.getElementById('tableWrapper').style.display = 'none';
         document.getElementById('downloadBtn').style.display = 'none';
         document.getElementById('printEnvelopesBtn').style.display = 'none';
         document.getElementById('bankSummary').style.display = 'none';
 
         try {
-            const [dataHalf1, dataHalf2] = await Promise.all([
-                readExcelFile(file1),
-                readExcelFile(file2)
-            ]);
-
             let employees = {};
 
-            function processHalf(data, isFirstHalf) {
-                data.forEach(row => {
-                    let id = String(row['رقم الهويه'] || '').trim().replace(/\.0$/, '');
-                    let name = String(row['الإســــــــــم'] || '').trim();
-
-                    if (!id || id === 'undefined' || !name || name === 'undefined' || name === 'nan') return;
-
-                    if (!employees[id]) employees[id] = { 'رقم الهويه': id, 'الإســــــــــم': name };
-
-                    if (row['الرقم الوظيفي ']) employees[id]['الرقم الوظيفي '] = row['الرقم الوظيفي '];
-                    if (row['الجنسيه']) employees[id]['الجنسيه'] = row['الجنسيه'];
-                    if (row['الورديه']) employees[id]['الورديه'] = row['الورديه'];
-                    if (row['مدير القسم']) employees[id]['مدير القسم'] = row['مدير القسم'];
-                    if (row['مهندس الموقع']) employees[id]['مهندس الموقع'] = row['مهندس الموقع'];
-                    if (row['المقاول']) employees[id]['المقاول'] = row['المقاول'];
-                    if (row['كاتب الدوام']) employees[id]['كاتب الدوام'] = row['كاتب الدوام'];
-
-                    let prof = String(row['المهنه'] || '').trim();
-                    let hours = parseFloat(row['ساعات العمل']) || 0;
-
-                    if (isFirstHalf) {
-                        employees[id]['المهنة (من 1 إلى 15)'] = prof;
-                        employees[id]['ساعات العمل (من 1 إلى 15)'] = hours;
-                        for (let i = 1; i <= 15; i++) {
-                            if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
-                        }
-                    } else {
-                        employees[id]['المهنة (من 16 إلى 31)'] = prof;
-                        employees[id]['ساعات العمل (من 16 إلى 31)'] = hours;
-                        for (let i = 16; i <= 31; i++) {
-                            if (row[i] !== undefined && row[i] !== "") employees[id][i] = row[i];
-                        }
-                    }
-                });
+            for (let i = 0; i < fileInput.files.length; i++) {
+                let fileData = await readExcelFile(fileInput.files[i]);
+                processFileGeneric(fileData, employees);
             }
-
-            processHalf(dataHalf1, true);
-            processHalf(dataHalf2, false);
 
             const standardCols = ['م', 'رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
             const dayCols = Array.from({length: 31}, (_, i) => String(i + 1));
@@ -509,15 +534,14 @@
 
                 let h1 = parseFloat(emp['ساعات العمل (من 1 إلى 15)']) || 0;
                 let h2 = parseFloat(emp['ساعات العمل (من 16 إلى 31)']) || 0;
-                let p1 = String(emp['المهنة (من 1 إلى 15)'] || '');
-                let p2 = String(emp['المهنة (من 16 إلى 31)'] || '');
+                let p1 = String(emp['المهنة (من 1 إلى 15)'] || emp['المهنة (من 16 إلى 31)'] || '');
 
                 row['ساعات العمل (من 1 إلى 15)'] = h1 || '';
                 row['ساعات العمل (من 16 إلى 31)'] = h2 || '';
                 row['إجمالي ساعات الشهر'] = h1 + h2;
 
-                let s1 = h1 * (p1 === 'عامل' ? rateWorker : rateOther);
-                let s2 = h2 * (p2 === 'عامل' ? rateWorker : rateOther);
+                let s1 = h1 * (p1.includes('عامل') ? rateWorker : rateOther);
+                let s2 = h2 * (p1.includes('عامل') ? rateWorker : rateOther);
                 let totalSalary = Math.round(s1 + s2);
 
                 row['راتب النصف الأول (ريال)'] = s1;
@@ -549,11 +573,11 @@
             renderBankSummary();
             renderTablePreview();
             prepareEnvelopesHTML(); 
-            showStatus("✅ تمت المعالجة بنجاح!", "success");
+            showStatus("✅ تمت المعالجة وحساب الرواتب بنجاح تام!", "success");
 
         } catch (error) {
             console.error(error);
-            showStatus("❌ حدث خطأ غير متوقع. يرجى التأكد من أن الملفات صحيحة ومطابقة.", "error");
+            showStatus("❌ حدث خطأ غير متوقع. يرجى التأكد من أن الملفات صحيحة.", "error");
         }
     }
 
