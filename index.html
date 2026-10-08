@@ -5,34 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
     
-    <!-- حماية أمنية: فحص الاتصال بالإنترنت والنطاق المعتمد -->
+    <!-- حماية نظيفة وخفيفة لا تؤثر على التصميم أو الأداء -->
     <script>
         (function() {
-            // 1. منع التشغيل نهائياً إذا لم يكن المتصفح متصلاً بالإنترنت (لمعنى منع الحفظ أوفلاين)
-            if (!navigator.onLine) {
-                document.documentElement.innerHTML = `
-                    <div style="font-family: Cairo, sans-serif; text-align: center; margin-top: 150px; color: #c0392b; direction: rtl;">
-                        <h1>⚠️ خطأ في الاتصال</h1>
-                        <h2>هذا النظام يتطلب اتصالاً نشطاً بالإنترنت ولا يمكن تشغيله محلياً (أوفلاين).</h2>
-                    </div>
-                `;
-                throw new Error("Offline execution blocked.");
-            }
-
-            // 2. التحقق من النطاق المسموح به (جيت هب الخاص بك أو للتطوير المحلي)
             const allowedUsername = "mohssen"; // اسمك على جيت هب
             const currentHost = window.location.hostname;
+            const currentProtocol = window.location.protocol;
             const isGithub = currentHost.includes(allowedUsername + ".github.io");
-            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentHost === "";
+            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:";
 
+            // إذا تم تشغيل الملف بطريقة غير مرخصة (ليس على جيت هب أو جهازك للتطوير)، يتم مسح الصفحة بأمان
             if (!isGithub && !isLocal) {
-                document.documentElement.innerHTML = `
-                    <div style="font-family: Cairo, sans-serif; text-align: center; margin-top: 150px; color: #c0392b; direction: rtl;">
-                        <h1>⚠️ تنبيه أمني - نسخة غير مرخصة</h1>
-                        <h2>هذا النظام محمي ولا يمكن تشغيله إلا من خلال المنصة الرسمية لشركة البحيرات الدولية.</h2>
-                    </div>
-                `;
-                throw new Error("Unauthorized domain execution blocked.");
+                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:150px; color:#c0392b; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
+                throw new Error("Unauthorized execution.");
             }
         })();
     </script>
@@ -296,7 +281,7 @@
     </div>
 
     <script>
-        const correctPassword = "123457"; 
+        const correctPassword = "123457";[cite: 6]
 
         function checkPassword() {
             const inputVal = document.getElementById('password-input').value;
