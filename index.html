@@ -4,6 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
+    
+    <!-- حماية أمنية: فحص الاتصال بالإنترنت والنطاق المعتمد -->
+    <script>
+        (function() {
+            // 1. منع التشغيل نهائياً إذا لم يكن المتصفح متصلاً بالإنترنت (لمعنى منع الحفظ أوفلاين)
+            if (!navigator.onLine) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: Cairo, sans-serif; text-align: center; margin-top: 150px; color: #c0392b; direction: rtl;">
+                        <h1>⚠️ خطأ في الاتصال</h1>
+                        <h2>هذا النظام يتطلب اتصالاً نشطاً بالإنترنت ولا يمكن تشغيله محلياً (أوفلاين).</h2>
+                    </div>
+                `;
+                throw new Error("Offline execution blocked.");
+            }
+
+            // 2. التحقق من النطاق المسموح به (جيت هب الخاص بك أو للتطوير المحلي)
+            const allowedUsername = "mohssen"; // اسمك على جيت هب
+            const currentHost = window.location.hostname;
+            const isGithub = currentHost.includes(allowedUsername + ".github.io");
+            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentHost === "";
+
+            if (!isGithub && !isLocal) {
+                document.documentElement.innerHTML = `
+                    <div style="font-family: Cairo, sans-serif; text-align: center; margin-top: 150px; color: #c0392b; direction: rtl;">
+                        <h1>⚠️ تنبيه أمني - نسخة غير مرخصة</h1>
+                        <h2>هذا النظام محمي ولا يمكن تشغيله إلا من خلال المنصة الرسمية لشركة البحيرات الدولية.</h2>
+                    </div>
+                `;
+                throw new Error("Unauthorized domain execution blocked.");
+            }
+        })();
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -207,6 +240,7 @@
 </head>
 <body>
 
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-card">
             <h1>شركة البحيرات الدولية</h1>
@@ -217,6 +251,7 @@
         </div>
     </div>
 
+    <!-- الواجهة الرئيسية (تظهر بعد كلمة المرور الصحيحة) -->
     <div id="main-content">
         <div class="container">
             <div class="header">
@@ -225,24 +260,28 @@
             </div>
 
             <div class="services-grid">
+                <!-- نظام الرواتب -->
                 <a href="payroll.html" class="card">
                     <div class="icon-circle">📊</div>
                     <h3>نظام الرواتب والفئات</h3>
                     <p>إدارة كشوفات الحضور وحساب الرواتب والفئات النقدية</p>
                 </a>
 
+                <!-- قارئ الهوية -->
                 <a href="iqama.html" class="card">
                     <div class="icon-circle">🪪</div>
                     <h3>قارئ الهوية الرقمية</h3>
                     <p>نظام استخراج وقراءة بيانات الهوية الرقمية</p>
                 </a>
 
+                <!-- الموردين -->
                 <a href="count.html" class="card">
                     <div class="icon-circle">💰</div>
                     <h3>حاسبة الفئات</h3>
                     <p> حساب عدد الفئات النقديه المطلوبة حسب كل راتب</p>
                 </a>
 
+                <!-- النماذج -->
                 <a href="namozg.html" class="card">
                     <div class="icon-circle">📰</div>
                     <h3>النماذج</h3>
