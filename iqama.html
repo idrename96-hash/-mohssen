@@ -4,6 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>قارئ الإقامة السعودية - الإصدار الموحد v10.30</title>
+<!-- كود حماية النطاق -->
+<script>
+    (function() {
+        const allowedUsername = "mohssen"; // استبدل بـ اسم المستخدم الخاص بك على جيت هب
+        const currentHost = window.location.hostname;
+        const currentProtocol = window.location.protocol;
+        if (!currentHost.includes(allowedUsername + ".github.io") && currentHost !== "localhost" && currentHost !== "127.0.0.1" && currentProtocol !== "file:") {
+            document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:100px; color:red; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
+            throw new Error("Unauthorized execution.");
+        }
+    })();
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
@@ -202,7 +214,7 @@ document.getElementById('saveKey').addEventListener('click', () => {
 });
 document.getElementById('saveSheetUrl').addEventListener('click', () => {
   localStorage.setItem('ocrspace_sheet_url', sheetUrlInput.value.trim()); alert('تم الحفظ!');
-  fetchGlobalCount(); // تحديث العداد بالرابط الجديد
+  fetchGlobalCount();
 });
 
 // ==========================================
@@ -211,10 +223,7 @@ document.getElementById('saveSheetUrl').addEventListener('click', () => {
 function fetchGlobalCount() {
   const url = sheetUrlInput.value.trim();
   if(!url) return;
-  
   document.getElementById('globalCounter').style.display = 'block';
-  
-  // طلب JSONP لتخطي الـ CORS وجلب العداد
   const script = document.createElement('script');
   script.src = url + "?callback=updateGlobalCountUI&t=" + Date.now();
   document.body.appendChild(script);
@@ -226,12 +235,8 @@ window.updateGlobalCountUI = function(data) {
   }
 };
 
-// تشغيل العداد فور فتح الصفحة
 window.addEventListener('load', fetchGlobalCount);
 
-// ==========================================
-// إرسال البيانات لجوجل شيت (مع تفادي الـ CORS)
-// ==========================================
 async function sendToSheet(type, payload){
   const url = sheetUrlInput.value.trim();
   const statusEl = document.getElementById('sheetSyncStatus');
@@ -239,18 +244,14 @@ async function sendToSheet(type, payload){
   try{
     const formData = new URLSearchParams();
     formData.append('data', JSON.stringify(Object.assign({ type }, payload)));
-
     await fetch(url, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: formData.toString()
     });
-
     statusEl.style.color = '#9FC2BB';
     statusEl.textContent = '📤 تم الحفظ في قاعدة البيانات بنجاح';
-    
-    // تحديث العداد المركزي بعد كل إرسال
     fetchGlobalCount();
   }catch(e){
     statusEl.style.color = '#EF5350';
@@ -258,9 +259,6 @@ async function sendToSheet(type, payload){
   }
 }
 
-// ==========================================
-// باقي أكواد التطبيق والمعالجة
-// ==========================================
 const folderInput = document.getElementById('folderInput');
 const fileInput = document.getElementById('fileInput');
 const openCamBtn = document.getElementById('openCamBtn');
@@ -336,7 +334,7 @@ function handleSelectedFiles(files, sourceType){
     resultsCard.style.display = 'none'; isCancelled = false;
     stopBtn.style.display = 'block'; stopBtn.textContent = '🛑 إيقاف وحفظ';
     startProcessing();
-  } else { folderStatus.textContent = '⚠️️ لم يتم العثور على صور صالحة.'; }
+  } else { folderStatus.textContent = '⚠ لم يتم العثور على صور صالحة.'; }
 }
 
 stopBtn.addEventListener('click', () => { isCancelled = true; stopBtn.disabled = true; stopBtn.textContent = 'جاري الإيقاف...'; });
@@ -612,7 +610,7 @@ async function startProcessing(){
 
       processedData.push(item);
       addRowToTable(item, processedData.length);
-      sendToSheet('success', item); // حفظ للشيت + درايف
+      sendToSheet('success', item);
     } catch(err) {
       failedFiles.push({ name: file.name, reason: err.message });
       addFailedRowToTable(file.name, err.message);
