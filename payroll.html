@@ -425,33 +425,21 @@
         });
     }
 
-    // دالة ذكية لتحديد هل البيانات تخص النصف الأول أو الثاني بناءً على أسماء أعمدة الأيام
-    function detectAndProcessData(data, employees) {
+    // دالة ذكية لفحص الأعمدة وتحديد ما إذا كان الملف يخص النصف الأول أو الثاني تلقائياً
+    function processFileGeneric(data, employees) {
         if (!data || data.length === 0) return;
 
-        // فحص الأعمدة المتاحة في أول صف لمعرفة نطاق الأيام (هل تحتوي على أعمدة من 1 إلى 15 أو من 16 إلى 31)
+        // فحص الأعمدة في أول صف لمعرفة نطاق الأيام الموجودة (1-15 أو 16-31)
         let sampleRow = data[0];
-        let hasFirstHalfDays = false;
-        let hasSecondHalfDays = false;
+        let isSecondHalfFile = false;
 
-        for (let i = 1; i <= 15; i++) {
-            if (sampleRow[i] !== undefined || sampleRow[String(i)] !== undefined) {
-                hasFirstHalfDays = true;
+        for (let key in sampleRow) {
+            let num = parseInt(key);
+            if (num >= 16 && num <= 31) {
+                isSecondHalfFile = true;
                 break;
             }
         }
-        for (let i = 16; i <= 31; i++) {
-            if (sampleRow[i] !== undefined || sampleRow[String(i)] !== undefined) {
-                hasSecondHalfDays = true;
-                break;
-            }
-        }
-
-        // إذا لم توجد أعمدة أيام صريحة، نتحقق من اسم الملف أو الأعمدة، أو نفترض تلقائياً بناءً على محتوى الأعمدة
-        // كحل بديل ومرن جداً: فحص إذا كانت الأعمدة تحتوي على رقم 1 أو 16
-        let isFirstHalf = hasFirstHalfDays || (!hasSecondHalfDays && !hasFirstHalfDays); // افتراضي أول إذا تساوى
-        if (hasSecondHalfDays && !hasFirstHalfDays) isFirstHalf = false;
-        if (hasFirstHalfDays && !hasSecondHalfDays) isFirstHalf = true;
 
         data.forEach(row => {
             let idKey = Object.keys(row).find(k => k.includes("رقم الهويه") || k.includes("الهوية"));
@@ -479,15 +467,19 @@
             let prof = String(profKey ? row[profKey] : '').trim();
             let hours = parseFloat(hoursKey ? row[hoursKey] : 0) || 0;
 
-            // تحديد النصف بناءً على فحص الأيام داخل الصف نفسه (مثلاً لو وجدنا عمود 1 إلى 15 فهو النصف الأول)
-            let rowHasCol1 = false;
-            let rowHasCol16 = false;
-            for(let c=1; c<=15; c++) if(row[c] !== undefined && row[c] !== "") rowHasCol1 = true;
-            for(let c=16; c<=31; c++) if(row[c] !== undefined && row[c] !== "") rowHasCol16 = true;
+            // تحديد هل الصف يحتوي على أيام النصف الأول أم الثاني بشكل دقيق
+            let hasCol1to15 = false;
+            let hasCol16to31 = false;
+            for (let c = 1; c <= 15; c++) {
+                if (row[c] !== undefined && row[c] !== "") hasCol1to15 = true;
+            }
+            for (let c = 16; c <= 31; c++) {
+                if (row[c] !== undefined && row[c] !== "") hasCol16to31 = true;
+            }
 
-            let targetIsFirst = rowHasCol1 ? true : (rowHasCol16 ? false : isFirstHalf);
+            let isFirst = hasCol1to15 ? true : (hasCol16to31 ? false : !isSecondHalfFile);
 
-            if (targetIsFirst) {
+            if (isFirst) {
                 employees[id]['المهنة (من 1 إلى 15)'] = prof;
                 employees[id]['ساعات العمل (من 1 إلى 15)'] = hours;
                 for (let i = 1; i <= 15; i++) {
@@ -526,8 +518,8 @@
 
             let employees = {};
 
-            detectAndProcessData(data1, employees);
-            detectAndProcessData(data2, employees);
+            processFileGeneric(data1, employees);
+            processFileGeneric(data2, employees);
 
             const standardCols = ['م', 'رقم الهويه', 'الرقم الوظيفي ', 'الإســــــــــم', 'الجنسيه', 'المهنة (من 1 إلى 15)', 'المهنة (من 16 إلى 31)', 'الورديه', 'مدير القسم', 'مهندس الموقع', 'المقاول', 'كاتب الدوام'];
             const dayCols = Array.from({length: 31}, (_, i) => String(i + 1));
@@ -553,15 +545,14 @@
 
                 let h1 = parseFloat(emp['ساعات العمل (من 1 إلى 15)']) || 0;
                 let h2 = parseFloat(emp['ساعات العمل (من 16 إلى 31)']) || 0;
-                let p1 = String(emp['المهنة (من 1 إلى 15)'] || '');
-                let p2 = String(emp['المهنة (من 16 إلى 31)'] || '');
+                let p1 = String(emp['المهنة (من 1 إلى 15)'] || emp['المهنة (من 16 إلى 31)'] || '');
 
                 row['ساعات العمل (من 1 إلى 15)'] = h1 || '';
                 row['ساعات العمل (من 16 إلى 31)'] = h2 || '';
                 row['إجمالي ساعات الشهر'] = h1 + h2;
 
                 let s1 = h1 * (p1.includes('عامل') ? rateWorker : rateOther);
-                let s2 = h2 * (p2.includes('عامل') ? rateWorker : rateOther);
+                let s2 = h2 * (p1.includes('عامل') ? rateWorker : rateOther);
                 let totalSalary = Math.round(s1 + s2);
 
                 row['راتب النصف الأول (ريال)'] = s1;
@@ -593,7 +584,7 @@
             renderBankSummary();
             renderTablePreview();
             prepareEnvelopesHTML(); 
-            showStatus("✅ تمت معالجة ودمج الملفات بنجاح تام بغض النظر عن الترتيب!", "success");
+            showStatus("✅ تمت المعالجة وحساب الرواتب بنجاح تام!", "success");
 
         } catch (error) {
             console.error(error);
