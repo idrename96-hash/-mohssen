@@ -4,45 +4,204 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلبية السحب النقدي السريع من البنك | البحيرات الدولية</title>
-    <!-- كود حماية النطاق -->
+    
+    <!-- حماية أمنية صارمة تمنع التشغيل المحلي -->
     <script>
         (function() {
-            const allowedUsername = "mohssen";
             const currentHost = window.location.hostname;
-            const currentProtocol = window.location.protocol;
-            if (!currentHost.includes(allowedUsername + ".github.io") && currentHost !== "localhost" && currentHost !== "127.0.0.1" && currentProtocol !== "file:") {
-                document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:100px; color:red;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
-                throw new Error("Unauthorized execution.");
+            const isGithub = currentHost.endsWith(".github.io");
+
+            if (!isGithub) {
+                document.write(`
+                    <!DOCTYPE html>
+                    <html lang="ar" dir="rtl">
+                    <head><meta charset="UTF-8"><title>تنبيه أمني</title></head>
+                    <body style="font-family: Cairo, sans-serif; background-color: #1e3c72; color: #fff; text-align: center; padding-top: 150px;">
+                        <h1 style="color: #ff4d4d; font-size: 32px;">⚠️ تنبيه أمني - نسخة غير مرخصة</h1>
+                        <h2 style="font-size: 20px; margin-top: 20px;">هذا النظام محمي ولا يمكن تشغيله محلياً أو أوفلاين.</h2>
+                        <p style="color: #ccc; margin-top: 10px;">يجب فتحه حصرياً من خلال الرابط الرسمي للمنصة.</p>
+                    </body>
+                    </html>
+                `);
+                document.close();
+                throw new Error("Security Violation: Local execution blocked.");
             }
         })();
     </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #1e3c72; --primary-light: #2a5298; --accent: #00b09b;
-            --bg-color: #f0f2f5; --card-bg: #ffffff; --text-dark: #333333; --border-color: #e1e4e8; --bank-color: #f39c12;
+            --primary: #1e3c72;
+            --primary-light: #2a5298;
+            --accent: #00b09b;
+            --accent-hover: #008374;
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-dark: #333333;
+            --text-gray: #666666;
+            --border-color: #e1e4e8;
+            --bank-color: #f39c12;
         }
 
-        body { font-family: 'Cairo', sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; color: var(--text-dark); }
-        .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 30px; border-radius: 15px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
-        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 15px; }
-        .back-btn { background-color: var(--primary); color: white; padding: 8px 15px; border-radius: 8px; text-decoration: none; font-size: 14px; transition: 0.3s; }
-        .back-btn:hover { background-color: var(--accent); }
-        h2 { color: var(--primary); margin: 0; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--primary); }
-        textarea { width: 100%; height: 200px; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 16px; box-sizing: border-box; outline: none; resize: vertical; transition: 0.3s; }
-        textarea:focus { border-color: var(--primary-light); }
-        .btn { background: linear-gradient(to left, var(--primary), var(--primary-light)); color: white; border: none; padding: 15px 30px; border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 18px; font-weight: 700; cursor: pointer; width: 100%; transition: 0.3s; box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2); }
-        .btn:hover { box-shadow: 0 6px 20px rgba(30, 60, 114, 0.4); transform: translateY(-2px); }
-        #bankSummary { display: none; margin-top: 30px; border-top: 3px dashed var(--bank-color); padding-top: 20px; }
-        .bank-title { color: var(--bank-color); text-align: center; margin-bottom: 20px; font-size: 22px; font-weight: 800; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 15px; }
-        .summary-box { background: #fffdfa; padding: 15px; border-radius: 8px; text-align: center; border: 1px solid #fae5d3; }
-        .summary-box .title { display: block; color: #666; font-size: 14px; font-weight: 600; margin-bottom: 5px; }
-        .summary-box .count { display: block; font-size: 26px; color: var(--bank-color); font-weight: 800; line-height: 1.1; }
-        .summary-box .sub-val { display: block; font-size: 12px; color: #888; font-weight: 600; margin-top: 4px; }
-        .total-badge { text-align: center; background: #e6fffa; border: 1px solid #b2f5ea; padding: 15px; border-radius: 8px; margin-bottom: 20px; font-size: 18px; color: #234e52; font-weight: bold; }
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-dark);
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+        }
+
+        .back-btn {
+            background-color: var(--primary);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background-color: var(--accent);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin: 0;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+            outline: none;
+            resize: vertical;
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+            border-color: var(--primary-light);
+        }
+
+        .btn {
+            background: linear-gradient(to left, var(--primary), var(--primary-light));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-family: 'Cairo', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.2);
+        }
+
+        .btn:hover {
+            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.4);
+            transform: translateY(-2px);
+        }
+
+        #bankSummary {
+            display: none;
+            margin-top: 30px;
+            border-top: 3px dashed var(--bank-color);
+            padding-top: 20px;
+        }
+
+        .bank-title {
+            color: var(--bank-color);
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 22px;
+            font-weight: 800;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+        }
+
+        .summary-box {
+            background: #fffdfa;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #fae5d3;
+        }
+
+        .summary-box .title {
+            display: block;
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .summary-box .count {
+            display: block;
+            font-size: 26px;
+            color: var(--bank-color);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+
+        .summary-box .sub-val {
+            display: block;
+            font-size: 12px;
+            color: #888;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        .total-badge {
+            text-align: center;
+            background: #e6fffa;
+            border: 1px solid #b2f5ea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #234e52;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +214,11 @@
 
         <div class="form-group">
             <label for="salaries-input">الصق رواتب الموظفين هنا (كل راتب في سطر منفصل):</label>
-            <textarea id="salaries-input" placeholder="مثال:&#10;3120&#10;4320&#10;2880&#10;3936"></textarea>
+            <textarea id="salaries-input" placeholder="مثال:
+3120
+4320
+2880
+3936"></textarea>
         </div>
 
         <button class="btn" onclick="calculateBankRequest()">🧮 حساب طلبية السحب من البنك</button>
@@ -73,8 +236,10 @@
         function calculateBankRequest() {
             const textValue = document.getElementById('salaries-input').value;
             const lines = textValue.split('\n');
+            
             let bankTotals = { sum: 0 };
             denominations.forEach(d => bankTotals[d] = 0);
+
             let hasValues = false;
 
             lines.forEach(line => {
@@ -83,6 +248,7 @@
                     hasValues = true;
                     let salary = Math.round(cleanVal);
                     bankTotals.sum += salary;
+
                     let remaining = salary;
                     denominations.forEach(denom => {
                         let count = Math.floor(remaining / denom);
@@ -92,15 +258,20 @@
                 }
             });
 
-            if (!hasValues) { alert("الرجاء إدخال رواتب صحيحة (كل راتب في سطر)."); return; }
+            if (!hasValues) {
+                alert("الرجاء إدخال رواتب صحيحة (كل راتب في سطر).");
+                return;
+            }
 
             document.getElementById('grandTotalText').innerText = `إجمالي المطلوب سحبه: ${bankTotals.sum.toLocaleString()} ريال`;
+            
             const grid = document.getElementById('summaryGrid');
             grid.innerHTML = '';
             
             denominations.forEach(denom => {
                 const count = bankTotals[denom];
                 const totalValue = count * denom;
+                
                 const div = document.createElement('div');
                 div.className = 'summary-box';
                 div.innerHTML = `
@@ -110,8 +281,10 @@
                 `;
                 grid.appendChild(div);
             });
+
             document.getElementById('bankSummary').style.display = 'block';
         }
     </script>
+
 </body>
 </html>
