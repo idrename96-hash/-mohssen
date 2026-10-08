@@ -5,16 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>البحيرات الدولية | تسجيل الدخول</title>
     
-    <!-- حماية نظيفة وخفيفة لا تؤثر على التصميم أو الأداء -->
+    <!-- تعديل شرط النطاق ليطابق رابطك الحالي على جيت هب بدقة وبدون تشويه -->
     <script>
         (function() {
-            const allowedUsername = "mohssen"; // اسمك على جيت هب
             const currentHost = window.location.hostname;
             const currentProtocol = window.location.protocol;
-            const isGithub = currentHost.includes(allowedUsername + ".github.io");
-            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:";
+            
+            // السماح بالعمل على جيت هب (أي مستودع يتبع github.io) أو محلياً
+            const isGithub = currentHost.endsWith(".github.io");
+            const isLocal = currentHost === "localhost" || currentHost === "127.0.0.1" || currentProtocol === "file:" || currentHost === "";
 
-            // إذا تم تشغيل الملف بطريقة غير مرخصة (ليس على جيت هب أو جهازك للتطوير)، يتم مسح الصفحة بأمان
             if (!isGithub && !isLocal) {
                 document.documentElement.innerHTML = `<h1 style="text-align:center; margin-top:150px; color:#c0392b; font-family:Cairo,sans-serif;">⚠️ تنبيه أمني: غير مسموح بتشغيل هذه النسخة خارج المنصة الرسمية.</h1>`;
                 throw new Error("Unauthorized execution.");
