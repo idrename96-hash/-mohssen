@@ -127,6 +127,37 @@
 
         #envelopesPrintArea { display: none; }
 
+        .note-form { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr auto; gap: 12px; align-items: end; margin-bottom: 15px; }
+        .note-form textarea { padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-family: 'Cairo', sans-serif; font-size: 15px; outline: none; background: #fff; width: 100%; box-sizing: border-box; resize: vertical; direction: ltr; text-align: right; }
+        .note-form textarea:focus { border-color: var(--primary-light); }
+        .note-group { border: 1px solid var(--border-color); border-radius: 10px; margin-bottom: 12px; background: #fffdfa; overflow: hidden; }
+        .note-group-head { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: #fff3e0; flex-wrap: wrap; }
+        .note-group-head .g-text { flex: 1; font-weight: 800; color: #d35400; }
+        .note-group-head .g-count { font-size: 13px; font-weight: 700; color: var(--text-gray); }
+        .note-group-head button { background: #fdecea; color: #c0392b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700; }
+        .note-chips { display: flex; flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+        .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 6px 4px 10px; border-radius: 20px; font-size: 13px; font-weight: 700; direction: ltr; background: #e6f7f5; color: var(--accent-hover); }
+        .chip.miss { background: #fdecea; color: #c0392b; }
+        .chip button { all: unset; cursor: pointer; font-weight: 900; padding: 0 6px; border-radius: 50%; }
+        .chip button:hover { background: rgba(0,0,0,.1); }
+        .note-form input[type="text"], .note-form select {
+            padding: 12px; border: 2px solid var(--border-color); border-radius: 8px;
+            font-family: 'Cairo', sans-serif; font-size: 15px; outline: none; background: #fff; width: 100%; box-sizing: border-box;
+        }
+        .note-form input[type="text"]:focus, .note-form select:focus { border-color: var(--primary-light); }
+        .note-form label { display: block; font-weight: 600; margin-bottom: 6px; color: var(--primary); font-size: 14px; }
+        .btn-note { margin: 0; width: auto; padding: 12px 22px; font-size: 16px; background: linear-gradient(to left, var(--bank-color), #f5b041); box-shadow: 0 4px 15px rgba(243,156,18,.2); }
+        #noteMsg { font-size: 14px; font-weight: 600; margin-bottom: 10px; min-height: 18px; }
+        #noteMsg.error { color: #e74c3c; } #noteMsg.success { color: var(--accent); }
+        .note-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 8px; background: #fffdfa; flex-wrap: wrap; }
+        .note-item .n-id { font-weight: 800; color: var(--primary); min-width: 120px; direction: ltr; text-align: right; }
+        .note-item .n-text { flex: 1; font-weight: 600; }
+        .note-item .n-badge { font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 20px; }
+        .n-ok { background: #e6f7f5; color: var(--accent-hover); }
+        .n-miss { background: #fdecea; color: #c0392b; }
+        .note-item button { background: #fdecea; color: #c0392b; border: none; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-family: 'Cairo', sans-serif; font-weight: 700; }
+        @media (max-width: 800px) { .note-form { grid-template-columns: 1fr; } }
+
         @media print {
             @page { size: 22cm 11cm; margin: 0; }
             body, html { width: 22cm; margin: 0; padding: 0; }
@@ -150,6 +181,7 @@
                 font-size: 14px; font-weight: 800; color: #000;
             }
             .env-horizontal-table th { background-color: #e6e6e6; font-size: 12px; }
+            .env-horizontal-table td.env-note-cell { text-align: right; font-size: 14px; padding: 6px 12px; background-color: #f2f2f2; }
         }
     </style>
 </head>
@@ -182,6 +214,26 @@
             </div>
             <div id="fileNames" style="margin-top:10px; font-weight:600; color:var(--primary); line-height:1.9;"></div>
         </div>
+
+        <h3 style="color:var(--primary);">3. ملاحظات الظروف (اختياري)</h3>
+        <p class="hint">اكتب رقم أو أكثر من أرقام الهوية/الإقامة (افصل بينها بمسافة أو فاصلة أو سطر جديد)، ثم اختر ملاحظة جاهزة أو «ملاحظة مخصصة». تقدر تكرر الخطوات لمجموعات مختلفة بملاحظات مختلفة، ويجوز أكثر من ملاحظة لنفس الموظف. تُطبع الملاحظات على الظروف فقط، ولا تظهر في الجدول أو ملف الإكسيل.</p>
+        <div class="note-form">
+            <div>
+                <label for="noteId">أرقام الهوية / الإقامة (رقم أو أكثر)</label>
+                <textarea id="noteId" rows="3" placeholder="الصق أو اكتب الأرقام، افصل بينها بمسافة أو فاصلة أو سطر جديد"></textarea>
+            </div>
+            <div>
+                <label for="notePreset">الملاحظة</label>
+                <select id="notePreset" onchange="onPresetChange()"></select>
+            </div>
+            <div id="customWrap" style="display:none;">
+                <label for="noteCustom">نص الملاحظة</label>
+                <input type="text" id="noteCustom" placeholder="اكتب الملاحظة هنا">
+            </div>
+            <button class="btn btn-note" type="button" onclick="addNote()">➕ إضافة</button>
+        </div>
+        <div id="noteMsg"></div>
+        <div id="notesList" style="margin-bottom:20px;"></div>
 
         <button class="btn" onclick="processFiles()">⚙️ معالجة وحساب الفئات</button>
         <div id="status" class="status"></div>
@@ -218,6 +270,145 @@
     const KEY_P2 = 'المهنة (من 16 إلى 31)';
     const KEY_H1 = 'ساعات العمل (من 1 إلى 15)';
     const KEY_H2 = 'ساعات العمل (من 16 إلى 31)';
+
+    // ===== ملاحظات الظروف (حسب رقم الهوية) =====
+    // عدّل هذه القائمة لتغيير النماذج الثابتة
+    const NOTE_PRESETS = ['خصم ID', 'خصم سلفة', 'خصم مخالفة'];
+    const CUSTOM_VALUE = '__custom__';
+    let notesById = {};
+
+    function normId(v) {
+        return String(v === undefined || v === null ? '' : v)
+            .replace(/[\u0660-\u0669]/g, d => String(d.charCodeAt(0) - 0x0660))
+            .replace(/[\u06F0-\u06F9]/g, d => String(d.charCodeAt(0) - 0x06F0))
+            .replace(/\s+/g, '')
+            .replace(/\.0$/, '');
+    }
+
+    function initNotesUI() {
+        const sel = document.getElementById('notePreset');
+        sel.innerHTML = '';
+        NOTE_PRESETS.forEach(t => { const o = document.createElement('option'); o.value = t; o.textContent = t; sel.appendChild(o); });
+        const c = document.createElement('option'); c.value = CUSTOM_VALUE; c.textContent = '✏️ ملاحظة مخصصة...'; sel.appendChild(c);
+        document.getElementById('noteCustom').addEventListener('keydown', e => { if (e.key === 'Enter') addNote(); });
+        document.getElementById('noteId').addEventListener('keydown', e => { if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) addNote(); });
+    }
+
+    function onPresetChange() {
+        const custom = document.getElementById('notePreset').value === CUSTOM_VALUE;
+        document.getElementById('customWrap').style.display = custom ? 'block' : 'none';
+        if (custom) document.getElementById('noteCustom').focus();
+    }
+
+    function noteMsg(text, type) {
+        const el = document.getElementById('noteMsg');
+        el.textContent = text; el.className = type || '';
+    }
+
+    // تفصل الأرقام بمسافة أو فاصلة (عربية/إنجليزية) أو فاصلة منقوطة أو سطر جديد
+    function parseIds(raw) {
+        const out = [];
+        String(raw || '').split(/[\s,;،؛]+/).forEach(t => {
+            const id = normId(t);
+            if (id && !out.includes(id)) out.push(id);
+        });
+        return out;
+    }
+
+    function addNote() {
+        const ids = parseIds(document.getElementById('noteId').value);
+        const preset = document.getElementById('notePreset').value;
+        const text = (preset === CUSTOM_VALUE ? document.getElementById('noteCustom').value : preset).trim();
+
+        if (ids.length === 0) { noteMsg('⚠️ اكتب رقم هوية / إقامة واحد على الأقل.', 'error'); return; }
+        if (!text) { noteMsg('⚠️ اكتب نص الملاحظة.', 'error'); return; }
+
+        let added = 0, dup = 0;
+        ids.forEach(id => {
+            const arr = notesById[id] || (notesById[id] = []);
+            if (arr.includes(text)) dup++; else { arr.push(text); added++; }
+        });
+
+        document.getElementById('noteId').value = '';
+        document.getElementById('noteCustom').value = '';
+        let msg = `✅ أُضيفت الملاحظة «${text}» إلى ${added} رقم`;
+        if (dup) msg += ` (${dup} رقم عنده نفس الملاحظة مسبقًا فتم تجاهله)`;
+        noteMsg(msg, 'success');
+        renderNotesList();
+        refreshEnvelopes();
+        document.getElementById('noteId').focus();
+    }
+
+    function removeNote(id, text) {
+        const arr = notesById[id] || [];
+        const i = arr.indexOf(text);
+        if (i > -1) arr.splice(i, 1);
+        if (arr.length === 0) delete notesById[id];
+        noteMsg('', '');
+        renderNotesList();
+        refreshEnvelopes();
+    }
+
+    function removeGroup(text) {
+        Object.keys(notesById).forEach(id => {
+            notesById[id] = notesById[id].filter(t => t !== text);
+            if (notesById[id].length === 0) delete notesById[id];
+        });
+        noteMsg('', '');
+        renderNotesList();
+        refreshEnvelopes();
+    }
+
+    // العرض مجمّع حسب نص الملاحظة: كل ملاحظة وتحتها الأرقام المرتبطة بها
+    function renderNotesList() {
+        const box = document.getElementById('notesList');
+        box.innerHTML = '';
+        const processed = globalFinalData.length > 0;
+        const known = new Set(globalFinalData.map(r => normId(r['رقم الهويه'])).filter(Boolean));
+
+        const groups = {};
+        Object.keys(notesById).forEach(id => {
+            notesById[id].forEach(t => { (groups[t] = groups[t] || []).push(id); });
+        });
+
+        Object.keys(groups).forEach(text => {
+            const ids = groups[text];
+            const missing = processed ? ids.filter(i => !known.has(i)).length : 0;
+
+            const g = document.createElement('div');
+            g.className = 'note-group';
+
+            const head = document.createElement('div');
+            head.className = 'note-group-head';
+            head.innerHTML = `<span class="g-text">${escapeHtml(text)}</span>` +
+                `<span class="g-count">${ids.length} رقم${missing ? ` — <span style="color:#c0392b;">${missing} غير موجود في الملفات</span>` : ''}</span>`;
+            const delAll = document.createElement('button');
+            delAll.type = 'button'; delAll.textContent = 'حذف الكل';
+            delAll.onclick = () => removeGroup(text);
+            head.appendChild(delAll);
+            g.appendChild(head);
+
+            const chips = document.createElement('div');
+            chips.className = 'note-chips';
+            ids.forEach(id => {
+                const chip = document.createElement('span');
+                chip.className = 'chip' + (processed && !known.has(id) ? ' miss' : '');
+                chip.title = processed ? (known.has(id) ? 'موجود في الملفات' : 'الرقم غير موجود في الملفات') : '';
+                chip.appendChild(document.createTextNode(id));
+                const x = document.createElement('button');
+                x.type = 'button'; x.textContent = '×';
+                x.onclick = () => removeNote(id, text);
+                chip.appendChild(x);
+                chips.appendChild(chip);
+            });
+            g.appendChild(chips);
+            box.appendChild(g);
+        });
+    }
+
+    function refreshEnvelopes() {
+        if (globalFinalData.length > 0) prepareEnvelopesHTML();
+    }
 
     function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -510,6 +701,7 @@
             renderBankSummary();
             renderTablePreview();
             prepareEnvelopesHTML();
+            renderNotesList();
             showStatus(`✅ ${modeMsg} بنجاح!`, "success");
 
         } catch (error) {
@@ -592,6 +784,7 @@
             let profession = emp[KEY_P2] || emp[KEY_P1] || '-';
             let totalHours = emp['إجمالي ساعات الشهر'] || 0;
             let totalSalary = emp['إجمالي الراتب المستحق (ريال)'] ? emp['إجمالي الراتب المستحق (ريال)'].toLocaleString() : '0';
+            let note = (notesById[normId(emp['رقم الهويه'])] || []).join('  |  ');
 
             let card = document.createElement('div');
             card.className = 'envelope-row-card';
@@ -619,11 +812,14 @@
                         <td>${totalHours}</td>
                         <td>${totalSalary}</td>
                     </tr>
+                    ${note ? `<tr><td colspan="7" class="env-note-cell">ملاحظة: ${escapeHtml(note)}</td></tr>` : ''}
                 </table>
             `;
             container.appendChild(card);
         });
     }
+
+    initNotesUI();
 
     function printEnvelopes() {
         window.print();
