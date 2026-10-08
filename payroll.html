@@ -405,36 +405,16 @@
         statusEl.className = `status ${type}`;
     }
 
-    // دالة ذكية لقراءة الإكسيل والبحث عن الهيدر في أي صف تلقائياً
     function readExcelFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array' });
-                    const firstSheetName = workbook.SheetNames[0];
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    
-                    // تحويل الشيت إلى مصفوفة صفوف (أرفاي أوف أرفايز) للبحث عن صف الهيدر
-                    const rawRows = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: "" });
-                    
-                    let headerRowIndex = 0;
-                    // البحث الذكي عن الصف الذي يحتوي على أعمدة أساسية مثل "رقم الهويه" أو "الإســــــــــم"
-                    for (let i = 0; i < rawRows.length; i++) {
-                        let rowStr = JSON.stringify(rawRows[i]);
-                        if (rowStr.includes("رقم الهويه") || rowStr.includes("الإســــــــــم") || rowStr.includes("الاسم")) {
-                            headerRowIndex = i;
-                            break;
-                        }
-                    }
-
-                    // إعادة قراءة الشيت مع تحديد الهيدر الصحيح الذي تم اكتشافه تلقائياً
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { range: headerRowIndex, defval: "" });
-                    resolve(jsonData);
-                } catch (err) {
-                    reject(err);
-                }
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { range: 1, defval: "" });
+                resolve(jsonData);
             };
             reader.onerror = (error) => reject(error);
             reader.readAsArrayBuffer(file);
@@ -468,31 +448,23 @@
 
             function processHalf(data, isFirstHalf) {
                 data.forEach(row => {
-                    // البحث بمرونة عن مفاتيح الهيدر بغض النظر عن المسافات أو الفروقات البسيطة
-                    let idKey = Object.keys(row).find(k => k.includes("رقم الهويه") || k.includes("الهوية"));
-                    let nameKey = Object.keys(row).find(k => k.includes("الإســــــــــم") || k.includes("الاسم"));
-                    let profKey = Object.keys(row).find(k => k.includes("المهنه") || k.includes("المهنة"));
-                    let hoursKey = Object.keys(row).find(k => k.includes("ساعات العمل"));
-
-                    let id = String(idKey ? row[idKey] : '').trim().replace(/\.0$/, '');
-                    let name = String(nameKey ? row[nameKey] : '').trim();
+                    let id = String(row['رقم الهويه'] || '').trim().replace(/\.0$/, '');
+                    let name = String(row['الإســــــــــم'] || '').trim();
 
                     if (!id || id === 'undefined' || !name || name === 'undefined' || name === 'nan') return;
 
                     if (!employees[id]) employees[id] = { 'رقم الهويه': id, 'الإســــــــــم': name };
 
-                    for (let key in row) {
-                        if (key.includes("الرقم الوظيفي")) employees[id]['الرقم الوظيفي '] = row[key];
-                        if (key.includes("الجنسيه") || key.includes("الجنسية")) employees[id]['الجنسيه'] = row[key];
-                        if (key.includes("الورديه") || key.includes("الوردية")) employees[id]['الورديه'] = row[key];
-                        if (key.includes("مدير القسم")) employees[id]['مدير القسم'] = row[key];
-                        if (key.includes("مهندس الموقع")) employees[id]['مهندس الموقع'] = row[key];
-                        if (key.includes("المقاول")) employees[id]['المقاول'] = row[key];
-                        if (key.includes("كاتب الدوام")) employees[id]['كاتب الدوام'] = row[key];
-                    }
+                    if (row['الرقم الوظيفي ']) employees[id]['الرقم الوظيفي '] = row['الرقم الوظيفي '];
+                    if (row['الجنسيه']) employees[id]['الجنسيه'] = row['الجنسيه'];
+                    if (row['الورديه']) employees[id]['الورديه'] = row['الورديه'];
+                    if (row['مدير القسم']) employees[id]['مدير القسم'] = row['مدير القسم'];
+                    if (row['مهندس الموقع']) employees[id]['مهندس الموقع'] = row['مهندس الموقع'];
+                    if (row['المقاول']) employees[id]['المقاول'] = row['المقاول'];
+                    if (row['كاتب الدوام']) employees[id]['كاتب الدوام'] = row['كاتب الدوام'];
 
-                    let prof = String(profKey ? row[profKey] : '').trim();
-                    let hours = parseFloat(hoursKey ? row[hoursKey] : 0) || 0;
+                    let prof = String(row['المهنه'] || '').trim();
+                    let hours = parseFloat(row['ساعات العمل']) || 0;
 
                     if (isFirstHalf) {
                         employees[id]['المهنة (من 1 إلى 15)'] = prof;
@@ -544,8 +516,8 @@
                 row['ساعات العمل (من 16 إلى 31)'] = h2 || '';
                 row['إجمالي ساعات الشهر'] = h1 + h2;
 
-                let s1 = h1 * (p1.includes('عامل') ? rateWorker : rateOther);
-                let s2 = h2 * (p2.includes('عامل') ? rateWorker : rateOther);
+                let s1 = h1 * (p1 === 'عامل' ? rateWorker : rateOther);
+                let s2 = h2 * (p2 === 'عامل' ? rateWorker : rateOther);
                 let totalSalary = Math.round(s1 + s2);
 
                 row['راتب النصف الأول (ريال)'] = s1;
@@ -577,11 +549,11 @@
             renderBankSummary();
             renderTablePreview();
             prepareEnvelopesHTML(); 
-            showStatus("✅ تمت المعالجة بنجاح وقراءة الهيدر تلقائياً من أي صف!", "success");
+            showStatus("✅ تمت المعالجة بنجاح!", "success");
 
         } catch (error) {
             console.error(error);
-            showStatus("❌ حدث خطأ غير متوقع. يرجى التأكد من أن الملفات صحيحة.", "error");
+            showStatus("❌ حدث خطأ غير متوقع. يرجى التأكد من أن الملفات صحيحة ومطابقة.", "error");
         }
     }
 
